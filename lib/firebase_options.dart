@@ -48,7 +48,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyDCX7ChEz0g8HPENDeuBCWhf2R4AniaDCw',
-    appId: '1:894071181361:web:dcbc344914a07e40478510',
+    appId: '1:894071181361:web:d34a8ed5fac577b2478510',
     messagingSenderId: '894071181361',
     projectId: 'malenia-400d7',
     authDomain: 'malenia-400d7.firebaseapp.com',
