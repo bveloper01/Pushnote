@@ -39,6 +39,7 @@ dependencies:
   firebase_auth: ^4.10.1
   firebase_storage: ^11.2.8
   image_picker: ^1.0.4
+  cloud_firestore: ^4.9.3
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +67,7 @@ flutter:
   assets:
     - Images/one.png
     - Images/two.png
+    - Images/avatar.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

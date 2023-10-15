@@ -1,4 +1,8 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:push_drive/widgets/image_picker.dart';
@@ -18,29 +22,75 @@ class _AuthScreenState extends State<AuthScreen> {
   var _isLogin = true;
   var _enteredEmail = '';
   var _enteredPassword = '';
+  File? _selectedImage;
+  var _isArther = false;
+
   void _submit() async {
     final isValid = _formKey.currentState!.validate();
-    if (!isValid) {
-      return;
+
+    if (!isValid || !_isLogin && _selectedImage == null) {
+      if (_selectedImage == null && !_isLogin) {
+        setState(() {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              duration: Duration(seconds: 1),
+              content: Center(
+                  child: Text(
+                'Please select an image',
+                style: TextStyle(fontSize: 14),
+              )),
+            ),
+          );
+        });
+      }
+      return; // This return statement should be outside of the setState block
     }
+
+// This return statement should be outside of the setState block
 
     _formKey.currentState!.save();
     try {
+      setState(() {
+        _isArther = true;
+      });
       if (_isLogin) {
-        final userCredential = await _firebase.signInWithEmailAndPassword(
+        final userCred = await _firebase.signInWithEmailAndPassword(
             email: _enteredEmail, password: _enteredPassword);
       } else {
         final userCred = await _firebase.createUserWithEmailAndPassword(
             email: _enteredEmail, password: _enteredPassword);
+
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('userImages')
+            .child('${userCred.user!.uid}.jpg');
+        await storageRef.putFile(_selectedImage!);
+        final imageUrl = await storageRef.getDownloadURL();
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCred.user!.uid)
+            .set({
+          'username': ' to be done...',
+          'email': _enteredEmail,
+          'image_url': imageUrl,
+        });
       }
     } on FirebaseAuthException catch (error) {
       if (error.code == 'email-alredy-in-use') {}
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(error.message ?? 'Authentication failed'),
+          duration: const Duration(seconds: 1),
+          content: Text(
+            error.message ?? 'Authentication failed',
+            style: const TextStyle(fontSize: 14),
+          ),
         ),
       );
+      setState(() {
+        _isArther = false;
+      });
     }
   }
 
@@ -124,7 +174,12 @@ class _AuthScreenState extends State<AuthScreen> {
                             ),
                           ],
                         ),
-                      if (!_isLogin) const UserImagePicker(),
+                      if (!_isLogin)
+                        UserImagePicker(
+                          onPickedImage: ((pickedImage) {
+                            _selectedImage = pickedImage;
+                          }),
+                        ),
                       TextFormField(
                         obscureText: false,
                         validator: (value) {
@@ -233,54 +288,66 @@ class _AuthScreenState extends State<AuthScreen> {
                       const SizedBox(
                         height: 20,
                       ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blueAccent),
-                              onPressed: _submit,
-                              child: Container(
-                                width: double.infinity,
-                                child: Center(
-                                  child: Text(
-                                    _isLogin ? 'Login' : 'Signup',
-                                    style: const TextStyle(
-                                        fontSize: 16, color: Colors.white),
-                                  ),
-                                ),
-                              )),
-                          FittedBox(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  _isLogin
-                                      ? 'Don\'t have an account?'
-                                      : 'Already have an account?',
-                                  style: const TextStyle(
-                                      fontSize: 15, color: Colors.black),
-                                ),
-                                TextButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        _isLogin = !_isLogin;
-                                      });
-                                    },
-                                    child: Text(
-                                      _isLogin
-                                          ? 'Create an Account '
-                                          : 'Log-in',
-                                      style: const TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.blue,
-                                          fontWeight: FontWeight.w700),
-                                    )),
-                              ],
+                      if (_isArther)
+                        const Column(
+                          children: [
+                            SizedBox(
+                              height: 12,
                             ),
-                          ),
-                        ],
-                      )
+                            CircularProgressIndicator(),
+                          ],
+                        ),
+                      if (!_isArther)
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blueAccent),
+                                onPressed: _submit,
+                                child: Container(
+                                  width: double.infinity,
+                                  child: Center(
+                                    child: Text(
+                                      _isLogin ? 'Login' : 'Signup',
+                                      style: const TextStyle(
+                                          fontSize: 16, color: Colors.white),
+                                    ),
+                                  ),
+                                )),
+                            FittedBox(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    _isLogin
+                                        ? 'Don\'t have an account?'
+                                        : 'Already have an account?',
+                                    style: const TextStyle(
+                                        fontSize: 15, color: Colors.black),
+                                  ),
+                                  TextButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          _isLogin = !_isLogin;
+                                          _selectedImage =
+                                              null; //Reset _selectedImage to null
+                                        });
+                                      },
+                                      child: Text(
+                                        _isLogin
+                                            ? 'Create an Account '
+                                            : 'Log-in',
+                                        style: const TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.blue,
+                                            fontWeight: FontWeight.w700),
+                                      )),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )
                     ],
                   ),
                 ),
