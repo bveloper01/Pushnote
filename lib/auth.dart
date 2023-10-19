@@ -21,9 +21,15 @@ class _AuthScreenState extends State<AuthScreen> {
   final _formKey = GlobalKey<FormState>();
   var _isLogin = true;
   var _enteredEmail = '';
+  var _enteredUsername = '';
   var _enteredPassword = '';
+  var Employer = 'Employer';
+  var Employee = 'Employee';
+
   File? _selectedImage;
   var _isArther = false;
+  var rolebutton = true;
+  var role = false;
 
   void _submit() async {
     final isValid = _formKey.currentState!.validate();
@@ -34,6 +40,7 @@ class _AuthScreenState extends State<AuthScreen> {
           ScaffoldMessenger.of(context).clearSnackBars();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
+              backgroundColor: Colors.blueAccent,
               duration: Duration(seconds: 1),
               content: Center(
                   child: Text(
@@ -47,17 +54,61 @@ class _AuthScreenState extends State<AuthScreen> {
       return; // This return statement should be outside of the setState block
     }
 
-// This return statement should be outside of the setState block
+    // This return statement should be outside of the setState block
 
     _formKey.currentState!.save();
-    try {
-      setState(() {
-        _isArther = true;
-      });
-      if (_isLogin) {
+
+    setState(() {
+      _isArther = true;
+    });
+    if (_isLogin) {
+      try {
         final userCred = await _firebase.signInWithEmailAndPassword(
             email: _enteredEmail, password: _enteredPassword);
-      } else {
+      } on FirebaseAuthException catch (error) {
+        if (error.message ==
+            'An internal error has occurred. [ INVALID_LOGIN_CREDENTIALS ]') {
+          ScaffoldMessenger.of(context)
+              .clearSnackBars(); // to clear any existing snackbars
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: Colors.blueAccent,
+              duration: Duration(seconds: 1),
+              content: Center(
+                child: Text(
+                  'Invalid Email or Password',
+                  style: TextStyle(fontSize: 14),
+                ),
+              ),
+            ),
+          );
+          setState(() {
+            _isArther = false;
+          });
+        } else {
+          ScaffoldMessenger.of(context)
+              .clearSnackBars(); // to clear any existing snackbars
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.blueAccent,
+              duration: const Duration(seconds: 1),
+              content: Center(
+                child: Center(
+                  child: Text(
+                    error.message ?? 'Authentication failed',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
+              ),
+            ),
+          );
+          setState(() {
+            _isArther = false;
+          });
+        }
+      }
+    } else {
+      try {
         final userCred = await _firebase.createUserWithEmailAndPassword(
             email: _enteredEmail, password: _enteredPassword);
 
@@ -71,26 +122,32 @@ class _AuthScreenState extends State<AuthScreen> {
             .collection('users')
             .doc(userCred.user!.uid)
             .set({
-          'username': ' to be done...',
+          'username': _enteredUsername,
           'email': _enteredEmail,
           'image_url': imageUrl,
+          'role': role ? Employer : Employee,
+        });
+        
+      } on FirebaseAuthException catch (error) {
+        if (error.code == 'email-alredy-in-use') {}
+        ScaffoldMessenger.of(context)
+            .clearSnackBars(); // to clear any existing snackbars
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.blueAccent,
+            duration: const Duration(seconds: 1),
+            content: Center(
+              child: Text(
+                error.message ?? 'Authentication failed',
+                style: const TextStyle(fontSize: 14),
+              ),
+            ),
+          ),
+        );
+        setState(() {
+          _isArther = false;
         });
       }
-    } on FirebaseAuthException catch (error) {
-      if (error.code == 'email-alredy-in-use') {}
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          duration: const Duration(seconds: 1),
-          content: Text(
-            error.message ?? 'Authentication failed',
-            style: const TextStyle(fontSize: 14),
-          ),
-        ),
-      );
-      setState(() {
-        _isArther = false;
-      });
     }
   }
 
@@ -112,13 +169,13 @@ class _AuthScreenState extends State<AuthScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (!_isLogin)
+                      if (!_isLogin && role)
                         Column(
                           children: [
                             const Column(children: [
                               Align(
                                 alignment: Alignment.topLeft,
-                                child: Text('Create Account',
+                                child: Text('Create a workspace',
                                     style: TextStyle(
                                         fontSize: 21.5,
                                         color: Colors.black,
@@ -135,7 +192,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             ]),
                             Container(
                               padding:
-                                  const EdgeInsets.only(top: 43, bottom: 10),
+                                  const EdgeInsets.only(top: 35, bottom: 10),
                               child: const Image(
                                 image: AssetImage("images/two.png"),
                                 width: 390.0,
@@ -169,6 +226,38 @@ class _AuthScreenState extends State<AuthScreen> {
                                   const EdgeInsets.only(top: 42, bottom: 10),
                               child: const Image(
                                 image: AssetImage("images/one.png"),
+                                width: 390.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                      if (!role &
+                          !_isLogin) // when it is not in role true state and not in login state this column will execute
+                        Column(
+                          children: [
+                            const Column(children: [
+                              Align(
+                                alignment: Alignment.topLeft,
+                                child: Text('Join a workspace',
+                                    style: TextStyle(
+                                        fontSize: 21.5,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600)),
+                              ),
+                              Align(
+                                alignment: Alignment.topLeft,
+                                child: Text('Sign-up to get started',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.black54,
+                                        fontWeight: FontWeight.w500)),
+                              ),
+                            ]),
+                            Container(
+                              padding:
+                                  const EdgeInsets.only(top: 8, bottom: 15),
+                              child: const Image(
+                                image: AssetImage("images/three.png"),
                                 width: 390.0,
                               ),
                             ),
@@ -237,6 +326,65 @@ class _AuthScreenState extends State<AuthScreen> {
                       const SizedBox(
                         height: 15,
                       ),
+                      if (!_isLogin)
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null ||
+                                value.trim().isEmpty ||
+                                value.trim().length < 4) {
+                              return 'Please enter at least 4 characters';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            _enteredUsername = value!;
+                          },
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          textCapitalization: TextCapitalization.none,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                            labelText: 'Username',
+                            labelStyle: const TextStyle(color: Colors.black),
+                            hintText: 'Enter your username here...',
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Colors.white,
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Color(0x00000000),
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Colors.red,
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Colors.red,
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            filled: true,
+                            contentPadding:
+                                const EdgeInsetsDirectional.fromSTEB(
+                                    16, 24, 0, 24),
+                          ),
+                        ),
+                      if (!_isLogin)
+                        const SizedBox(
+                          height: 15,
+                        ),
                       TextFormField(
                         obscureText: true,
                         onSaved: (value) {
@@ -297,15 +445,14 @@ class _AuthScreenState extends State<AuthScreen> {
                             CircularProgressIndicator(),
                           ],
                         ),
-                      if (!_isArther)
+                      if (!_isArther && rolebutton)
                         Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.blueAccent),
                                 onPressed: _submit,
-                                child: Container(
+                                child: SizedBox(
                                   width: double.infinity,
                                   child: Center(
                                     child: Text(
@@ -315,36 +462,114 @@ class _AuthScreenState extends State<AuthScreen> {
                                     ),
                                   ),
                                 )),
+                            const SizedBox(
+                              height: 17,
+                            ),
+                            Text(
+                              _isLogin
+                                  ? 'Don\'t have an account?'
+                                  : 'Already have an account?',
+                              style: const TextStyle(
+                                  fontSize: 15, color: Colors.black),
+                            ),
                             FittedBox(
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    _isLogin
-                                        ? 'Don\'t have an account?'
-                                        : 'Already have an account?',
-                                    style: const TextStyle(
-                                        fontSize: 15, color: Colors.black),
-                                  ),
                                   TextButton(
                                       onPressed: () {
                                         setState(() {
+                                          rolebutton = !rolebutton;
+                                          role = true;
                                           _isLogin = !_isLogin;
                                           _selectedImage =
                                               null; //Reset _selectedImage to null
+                                          _formKey.currentState!
+                                              .reset(); // Reset the form
                                         });
                                       },
                                       child: Text(
                                         _isLogin
-                                            ? 'Create an Account '
+                                            ? 'Create a workspace '
                                             : 'Log-in',
                                         style: const TextStyle(
                                             fontSize: 15,
                                             color: Colors.blue,
                                             fontWeight: FontWeight.w700),
                                       )),
+                                  if (rolebutton)
+                                    TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            role = false;
+                                            rolebutton = !rolebutton;
+                                            _formKey.currentState!
+                                                .reset(); // Reset the form
+                                            _isLogin = !_isLogin;
+                                            _selectedImage =
+                                                null; //Reset _selectedImage to null
+                                          });
+                                        },
+                                        child: const Text(
+                                          'Join a workspace',
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.blue,
+                                              fontWeight: FontWeight.w700),
+                                        )),
                                 ],
                               ),
+                            ),
+                          ],
+                        ),
+                      if (!_isArther && !rolebutton)
+                        Column(
+                          children: [
+                            ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blueAccent),
+                                onPressed: _submit,
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: Center(
+                                    child: Text(
+                                      _isLogin ? 'Login' : 'Signup',
+                                      style: const TextStyle(
+                                          fontSize: 16, color: Colors.white),
+                                    ),
+                                  ),
+                                )),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  _isLogin
+                                      ? 'Don\'t have an account?'
+                                      : 'Already have an account?',
+                                  style: const TextStyle(
+                                      fontSize: 15, color: Colors.black),
+                                ),
+                                TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        rolebutton = !rolebutton;
+                                        _formKey.currentState!
+                                            .reset(); // Reset the form
+                                        _isLogin = !_isLogin;
+                                        _selectedImage =
+                                            null; //Reset _selectedImage to null
+                                      });
+                                    },
+                                    child: Text(
+                                      _isLogin
+                                          ? 'Create a workspace '
+                                          : 'Log-in',
+                                      style: const TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.blue,
+                                          fontWeight: FontWeight.w700),
+                                    )),
+                              ],
                             ),
                           ],
                         )
