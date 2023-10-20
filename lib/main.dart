@@ -52,7 +52,7 @@ class App extends StatelessWidget {
                   if (userRole == 'Employer') {
                     return const ChatScreen(); // Replace with your Employer screen widget
                   } else if (userRole == 'Employee') {
-                    return const Emp(); // Replace with your Employee screen widget
+                    return const ChatScreen(); // Replace with your Employee screen widget
                   } else {
                     // Handle the case where the userRole variable is null
                     return const SplashScreen();
