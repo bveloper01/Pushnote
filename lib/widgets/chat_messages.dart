@@ -24,11 +24,16 @@ class ChatMessages extends StatelessWidget {
           );
         }
         if (!chatSnapshots.hasData || chatSnapshots.data!.docs.isEmpty) {
-          return const Center(child: Text('Image here no message found'));
+          return const Center(
+            child: Image(
+              image: AssetImage("images/empty.png"),
+              width: 180.0,
+            ),
+          );
         }
         if (chatSnapshots.hasError) {
           return const Center(
-            child: Text('another image here something went wrong'),
+            child: Text('Something went wrong..'),
           );
         }
         final loadedMessages = chatSnapshots.data!.docs;

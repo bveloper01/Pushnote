@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:push_drive/SplashScreen.dart';
-import 'package:push_drive/auth.dart';
+import 'package:push_drive/authScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:push_drive/chat.dart';
-import 'package:push_drive/widgets/diff.dart';
+import 'package:push_drive/navBar_sideDrawerScreen.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -50,9 +48,9 @@ class App extends StatelessWidget {
                   final userData = roleSnapshot.data!.data();
                   final userRole = userData?['role'];
                   if (userRole == 'Employer') {
-                    return const ChatScreen(); // Replace with your Employer screen widget
+                    return tabScreens(); // Replace with your Employer screen widget
                   } else if (userRole == 'Employee') {
-                    return const ChatScreen(); // Replace with your Employee screen widget
+                    return tabScreens(); // Replace with your Employee screen widget
                   } else {
                     // Handle the case where the userRole variable is null
                     return const SplashScreen();
@@ -69,3 +67,48 @@ class App extends StatelessWidget {
     );
   }
 }
+
+
+// import 'package:flutter/material.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_core/firebase_core.dart';
+
+// import 'package:push_drive/SplashScreen.dart';
+// import 'package:push_drive/authScreen.dart';
+// import 'package:push_drive/navBar_sideDrawerScreen.dart';
+// import 'firebase_options.dart';
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp(
+//     options: DefaultFirebaseOptions.currentPlatform,
+//   );
+//   runApp(const App());
+// }
+
+// class App extends StatelessWidget {
+//   const App({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       title: 'FlutterChat',
+//       theme: ThemeData().copyWith(
+//           useMaterial3: true, scaffoldBackgroundColor: Colors.black12),
+//       home: StreamBuilder(
+//           stream: FirebaseAuth.instance.authStateChanges(),
+//           builder: (ctx, snapshot) {
+//             if (snapshot.connectionState == ConnectionState.waiting) {
+//               return const SplashScreen();
+//             }
+
+//             if (snapshot.hasData) {
+//               return const tabScreens();
+//             }
+
+//             return const AuthScreen();
+//           }),
+//     );
+//   }
+// }

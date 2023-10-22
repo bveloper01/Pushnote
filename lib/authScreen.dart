@@ -1,9 +1,7 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
-import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:push_drive/widgets/image_picker.dart';
 
@@ -108,7 +106,7 @@ class _AuthScreenState extends State<AuthScreen> {
         }
       }
     } else {
-      try {
+      try { 
         final userCred = await _firebase.createUserWithEmailAndPassword(
             email: _enteredEmail, password: _enteredPassword);
 
@@ -127,7 +125,6 @@ class _AuthScreenState extends State<AuthScreen> {
           'image_url': imageUrl,
           'role': role ? Employer : Employee,
         });
-        
       } on FirebaseAuthException catch (error) {
         if (error.code == 'email-alredy-in-use') {}
         ScaffoldMessenger.of(context)

@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:push_drive/chat.dart';
 
 class NewMessage extends StatefulWidget {
   const NewMessage({super.key});
@@ -13,11 +11,31 @@ class NewMessage extends StatefulWidget {
 
 class _NewMessageState extends State<NewMessage> {
   final _messageController = TextEditingController();
+  var taskassignment = false;
+  
+
 
   @override
   void dispose() {
     _messageController.dispose();
     super.dispose();
+  }
+
+  void task() async {
+    final userHere = FirebaseAuth.instance.currentUser!;
+    final currUserData = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userHere.uid)
+        .get();
+    final role = currUserData.data()!['role'];
+
+    setState(() {
+      if (role == 'Employer') {
+        taskassignment = true;
+      } else {
+        taskassignment = false;
+      }
+    });
   }
 
   void submitMessage() async {
@@ -42,11 +60,17 @@ class _NewMessageState extends State<NewMessage> {
     });
   }
 
+  @override
+  void initState() {
+    task();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      // color: Colors.amber,
       height: 60,
-      padding: const EdgeInsets.only(left: 13, right: 6, bottom: 10),
+      padding: const EdgeInsets.only(left: 13, right: 10, bottom: 10),
       child: Row(
         children: [
           Expanded(
@@ -80,8 +104,31 @@ class _NewMessageState extends State<NewMessage> {
               ),
             ),
           )),
+          const SizedBox(
+            width: 7,
+          ),
+          if (taskassignment)
+            SizedBox(
+              width: 40,
+              height: 40,
+              child: FloatingActionButton(
+                  heroTag: 'newHeroTag', //added a hero tag here in this button cause there were two of therm 
+                  shape: const CircleBorder(), // and there should be different hero tags for them
+                  elevation: 0,
+                  onPressed: () {},
+                  child: const Icon(
+                    Icons.add_task_rounded,
+                    size: 22,
+                    color: Colors.white,
+                  )),
+            ),
+          if (taskassignment)
+            const SizedBox(
+              width: 6,
+            ),
           SizedBox(
-            height: 43,
+            width: 40,
+            height: 40,
             child: FloatingActionButton(
                 shape: const CircleBorder(),
                 elevation: 0,

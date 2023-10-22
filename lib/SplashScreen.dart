@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({
@@ -50,7 +49,7 @@ class SplashScreen extends StatelessWidget {
           ),
         ),
       ),
-      backgroundColor: Color.fromARGB(255, 204, 220, 235),
+      backgroundColor: const Color.fromARGB(255, 204, 220, 235),
     );
   }
 }
