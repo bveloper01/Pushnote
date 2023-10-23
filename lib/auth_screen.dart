@@ -106,7 +106,7 @@ class _AuthScreenState extends State<AuthScreen> {
         }
       }
     } else {
-      try { 
+      try {
         final userCred = await _firebase.createUserWithEmailAndPassword(
             email: _enteredEmail, password: _enteredPassword);
 
@@ -439,7 +439,9 @@ class _AuthScreenState extends State<AuthScreen> {
                             SizedBox(
                               height: 12,
                             ),
-                            CircularProgressIndicator(),
+                            CircularProgressIndicator(
+                              backgroundColor: Colors.white,
+                            ),
                           ],
                         ),
                       if (!_isArther && rolebutton)

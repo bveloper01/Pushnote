@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 
 class UserImagePicker extends StatefulWidget {
@@ -50,10 +49,10 @@ class _UserImagePickerState extends State<UserImagePicker> {
         ),
         TextButton.icon(
           onPressed: _pickImage,
-          icon: const Icon(Icons.image, color: Colors.blueAccent, size: 18.5),
+          icon: const Icon(Icons.image, color: Colors.blue, size: 18.5),
           label: const Text(
             'Add Image',
-            style: TextStyle(color: Colors.blueAccent),
+            style: TextStyle(color: Colors.blue),
           ),
         ),
       ],

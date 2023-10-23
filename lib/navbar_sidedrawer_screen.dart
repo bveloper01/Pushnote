@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:push_drive/SplashScreen.dart';
-import 'package:push_drive/chatScreen.dart';
-import 'package:push_drive/taskScreen.dart';
+import 'package:push_drive/chat_screen.dart';
+import 'package:push_drive/home_screen.dart';
+import 'package:push_drive/notification_screen.dart';
 import 'package:push_drive/widgets/drawer.dart';
 
 class tabScreens extends StatefulWidget {
@@ -14,10 +14,9 @@ class tabScreens extends StatefulWidget {
 class _tabScreensState extends State<tabScreens> {
   int _selectedPageIndex = 0;
   final screens = const [
-    AllTasks(),
-    SplashScreen(),
+    HomeScreen(),
     ChatScreen(),
-    AllTasks(),
+    NoficationScreen(),
   ];
 
   @override
@@ -28,6 +27,7 @@ class _tabScreensState extends State<tabScreens> {
       bottomNavigationBar: NavigationBarTheme(
         data: const NavigationBarThemeData(indicatorColor: Colors.blue),
         child: NavigationBar(
+          backgroundColor: const Color.fromARGB(255, 220, 230, 238),
           animationDuration: const Duration(seconds: 1, milliseconds: 300),
           selectedIndex: _selectedPageIndex,
           onDestinationSelected: (index) => setState(() {
@@ -36,7 +36,6 @@ class _tabScreensState extends State<tabScreens> {
           height: 65,
           destinations: const [
             NavigationDestination(icon: Icon(Icons.home_filled), label: 'Home'),
-            NavigationDestination(icon: Icon(Icons.add_task), label: 'Tasks'),
             NavigationDestination(
                 icon: Icon(Icons.chat_bubble_rounded), label: 'Chat'),
             NavigationDestination(

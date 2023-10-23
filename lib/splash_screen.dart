@@ -7,10 +7,10 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
-        child: Container(
-          child: const FittedBox(
+        child: SizedBox(
+          child: FittedBox(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -49,7 +49,7 @@ class SplashScreen extends StatelessWidget {
           ),
         ),
       ),
-      backgroundColor: const Color.fromARGB(255, 204, 220, 235),
+      backgroundColor: Color.fromARGB(255, 204, 220, 235),
     );
   }
 }

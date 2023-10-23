@@ -12,8 +12,6 @@ class NewMessage extends StatefulWidget {
 class _NewMessageState extends State<NewMessage> {
   final _messageController = TextEditingController();
   var taskassignment = false;
-  
-
 
   @override
   void dispose() {
@@ -112,8 +110,10 @@ class _NewMessageState extends State<NewMessage> {
               width: 40,
               height: 40,
               child: FloatingActionButton(
-                  heroTag: 'newHeroTag', //added a hero tag here in this button cause there were two of therm 
-                  shape: const CircleBorder(), // and there should be different hero tags for them
+                  heroTag:
+                      'newHeroTag', //added a hero tag here in this button cause there were two of therm
+                  shape:
+                      const CircleBorder(), // and there should be different hero tags for them
                   elevation: 0,
                   onPressed: () {},
                   child: const Icon(

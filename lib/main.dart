@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:push_drive/SplashScreen.dart';
-import 'package:push_drive/authScreen.dart';
+import 'package:push_drive/splash_screen.dart';
+import 'package:push_drive/auth_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:push_drive/navBar_sideDrawerScreen.dart';
+import 'package:push_drive/navbar_sidedrawer_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -48,9 +48,9 @@ class App extends StatelessWidget {
                   final userData = roleSnapshot.data!.data();
                   final userRole = userData?['role'];
                   if (userRole == 'Employer') {
-                    return tabScreens(); // Replace with your Employer screen widget
+                    return const tabScreens(); // Replace with your Employer screen widget
                   } else if (userRole == 'Employee') {
-                    return tabScreens(); // Replace with your Employee screen widget
+                    return const tabScreens(); // Replace with your Employee screen widget
                   } else {
                     // Handle the case where the userRole variable is null
                     return const SplashScreen();

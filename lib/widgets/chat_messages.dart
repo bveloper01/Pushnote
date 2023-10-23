@@ -25,15 +25,42 @@ class ChatMessages extends StatelessWidget {
         }
         if (!chatSnapshots.hasData || chatSnapshots.data!.docs.isEmpty) {
           return const Center(
-            child: Image(
-              image: AssetImage("images/empty.png"),
-              width: 180.0,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image(
+                  image: AssetImage("images/empty.png"),
+                  width: 180.0,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(right: 5),
+                  child: Text(
+                    "There are no recent messages",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
             ),
           );
         }
         if (chatSnapshots.hasError) {
           return const Center(
-            child: Text('Something went wrong..'),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image(
+                  image: AssetImage("images/wrong.png"),
+                  width: 210.0,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Text(
+                    "Something went wrong",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
           );
         }
         final loadedMessages = chatSnapshots.data!.docs;
