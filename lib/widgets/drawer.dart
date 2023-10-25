@@ -9,6 +9,7 @@ class MainDrawer extends StatelessWidget {
     return SafeArea(
       top: true,
       child: Drawer(
+        surfaceTintColor: Colors.white,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
               topRight: Radius.circular(10), bottomRight: Radius.circular(0)),

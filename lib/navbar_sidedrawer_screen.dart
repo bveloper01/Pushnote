@@ -27,7 +27,8 @@ class _tabScreensState extends State<tabScreens> {
       bottomNavigationBar: NavigationBarTheme(
         data: const NavigationBarThemeData(indicatorColor: Colors.blue),
         child: NavigationBar(
-          backgroundColor: const Color.fromARGB(255, 220, 230, 238),
+          surfaceTintColor: Colors.white,
+          backgroundColor: const Color.fromARGB(255, 196, 219, 237),
           animationDuration: const Duration(seconds: 1, milliseconds: 300),
           selectedIndex: _selectedPageIndex,
           onDestinationSelected: (index) => setState(() {

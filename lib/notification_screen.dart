@@ -25,7 +25,9 @@ class _NoficationScreenState extends State<NoficationScreen> {
                 fontWeight: FontWeight.w600),
           )),
       backgroundColor: Colors.white,
-      
+      body: const Center(
+        child: Text("Notifications"),
+      ),
     );
   }
 }

@@ -32,6 +32,7 @@ class _GlobalChatScreenState extends State<GlobalChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.white,
         backgroundColor: const Color.fromARGB(255, 196, 219, 237),
         toolbarHeight: 68,
         title: const Row(
@@ -61,7 +62,7 @@ class _GlobalChatScreenState extends State<GlobalChatScreen> {
           NewMessage(),
         ],
       ),
-      backgroundColor: const Color.fromARGB(255, 239, 236, 228),
+      backgroundColor: const Color.fromARGB(255, 239, 236, 226),
     );
   }
 }
