@@ -6,6 +6,7 @@ import 'package:push_drive/create_task_screen.dart';
 import 'package:push_drive/models/overview_data.dart';
 import 'package:push_drive/profile_screen.dart';
 import 'package:push_drive/widgets/drawer.dart';
+import 'package:push_drive/widgets/task_list.dart';
 import 'package:push_drive/widgets/overview_grid_item.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -51,91 +52,56 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildFloatingActionButton() {
-    if (showbtn) {
-      return Visibility(
-        visible: showbtn,
-        child: SpeedDial(
-          shape: RoundedRectangleBorder(
-            // Use RoundedRectangleBorder for a rectangular shape
-            borderRadius:
-                BorderRadius.circular(100.0), // Adjust the radius as needed
-          ),
-          activeIcon: Icons.close,
-          spacing: 6,
-          overlayColor: Colors.black38,
-          spaceBetweenChildren: 6,
-          children: [
-            SpeedDialChild(
-              elevation: 4,
-              labelStyle:
-                  const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
-              shape: const CircleBorder(),
-              child: const Icon(
-                Icons.note_add_outlined,
-                size: 28,
-              ),
-              label: 'Add a note',
-              onTap: () {},
-            ),
-            SpeedDialChild(
-              elevation: 4,
-              labelStyle:
-                  const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
-              shape: const CircleBorder(),
-              child: const Icon(
-                Icons.add_task_rounded,
-                size: 28,
-              ),
-              label: 'Assign a task',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const CreateTaskScreen()),
-                );
-              },
-            ),
-          ],
-          child: const Icon(
-            Icons.add,
-            size: 25,
-          ),
+    return Visibility(
+      visible: showbtn,
+      child: SpeedDial(
+        shape: RoundedRectangleBorder(
+          // Use RoundedRectangleBorder for a rectangular shape
+          borderRadius:
+              BorderRadius.circular(100.0), // Adjust the radius as needed
         ),
-      );
-    } else {
-      return Visibility(
-        visible: !showbtn,
-        child: SpeedDial(
-          shape: RoundedRectangleBorder(
-            // Use RoundedRectangleBorder for a rectangular shape
-            borderRadius:
-                BorderRadius.circular(100.0), // Adjust the radius as needed
-          ),
-          activeIcon: Icons.close,
-          spacing: 6,
-          overlayColor: Colors.black38,
-          spaceBetweenChildren: 6,
-          children: [
-            SpeedDialChild(
-              elevation: 4,
-              labelStyle:
-                  const TextStyle(fontWeight: FontWeight.w400, fontSize: 15),
-              shape: const CircleBorder(),
-              child: const Icon(
-                Icons.add_task_rounded,
-                size: 22,
-              ),
-              label: 'Assign task to yourself',
-              onTap: () {},
+        activeIcon: Icons.close,
+        spacing: 6,
+        overlayColor: Colors.black38,
+        spaceBetweenChildren: 6,
+        children: [
+          SpeedDialChild(
+            elevation: 4,
+            labelStyle:
+                const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+            shape: const CircleBorder(),
+            child: const Icon(
+              Icons.note_add_outlined,
+              size: 28,
             ),
-          ],
-          child: const Icon(
-            Icons.add,
-            size: 25,
+            label: 'Add a note',
+            onTap: () {},
           ),
+          SpeedDialChild(
+            elevation: 4,
+            labelStyle:
+                const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+            shape: const CircleBorder(),
+            child: const Icon(
+              Icons.add_task_rounded,
+              size: 28,
+            ),
+            label: 'Assign a task',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const CreateTaskScreen()),
+              );
+            },
+          ),
+        ],
+        child: const Icon(
+          Icons.add,
+          size: 25,
         ),
-      );
-    }
+      ),
+    );
   }
 
   @override
@@ -206,7 +172,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(12)),
                 surfaceTintColor: Colors.white,
                 color: const Color.fromARGB(230, 255, 255, 255),
-                margin: const EdgeInsets.all(11),
+                margin: const EdgeInsets.only(
+                    left: 11, right: 11, top: 11, bottom: 3),
                 child: Column(
                   children: [
                     const Align(
@@ -246,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            Container(),
+            EmployerTaskList(),
           ],
         ),
       ),

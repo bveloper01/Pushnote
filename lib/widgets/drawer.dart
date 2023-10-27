@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:push_drive/status_update_sreen.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key});
@@ -42,7 +43,12 @@ class MainDrawer extends StatelessWidget {
               Column(
                 children: [
                   ListTile(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TaskStatusListPage()));
+                    },
                     leading: const Icon(
                       Icons.dark_mode,
                       size: 22,

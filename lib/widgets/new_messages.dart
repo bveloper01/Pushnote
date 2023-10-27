@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:push_drive/create_task_screen.dart';
 
 class NewMessage extends StatefulWidget {
   const NewMessage({super.key});
@@ -115,7 +116,13 @@ class _NewMessageState extends State<NewMessage> {
                   shape:
                       const CircleBorder(), // and there should be different hero tags for them
                   elevation: 0,
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const CreateTaskScreen()),
+                    );
+                  },
                   child: const Icon(
                     Icons.add_task_rounded,
                     size: 22,

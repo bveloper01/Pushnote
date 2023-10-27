@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -116,6 +117,13 @@ class _AuthScreenState extends State<AuthScreen> {
             .child('${userCred.user!.uid}.jpg');
         await storageRef.putFile(_selectedImage!);
         final imageUrl = await storageRef.getDownloadURL();
+
+        final firebsecm = FirebaseMessaging.instance;
+        final noti = await firebsecm.requestPermission();
+
+        final token = await firebsecm.getToken();
+        print("the token is her guys $token");
+
         await FirebaseFirestore.instance
             .collection('users')
             .doc(userCred.user!.uid)
@@ -124,6 +132,7 @@ class _AuthScreenState extends State<AuthScreen> {
           'email': _enteredEmail,
           'image_url': imageUrl,
           'role': role ? Employer : Employee,
+          'deviceToken': token,
         });
       } on FirebaseAuthException catch (error) {
         if (error.code == 'email-alredy-in-use') {}
@@ -338,12 +347,12 @@ class _AuthScreenState extends State<AuthScreen> {
                           },
                           enableSuggestions: false,
                           autocorrect: false,
-                          textCapitalization: TextCapitalization.none,
+                          textCapitalization: TextCapitalization.words,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
-                            labelText: 'Username',
+                            labelText: 'Full Name',
                             labelStyle: const TextStyle(color: Colors.black),
-                            hintText: 'Enter your username here...',
+                            hintText: 'Enter your full name here...',
                             enabledBorder: OutlineInputBorder(
                               borderSide: const BorderSide(
                                 color: Colors.white,

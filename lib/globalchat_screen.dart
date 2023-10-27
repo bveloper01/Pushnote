@@ -15,8 +15,8 @@ class GlobalChatScreen extends StatefulWidget {
 class _GlobalChatScreenState extends State<GlobalChatScreen> {
   void setUpPushNotification() async {
     final fcm = FirebaseMessaging.instance;
-    await fcm.requestPermission();
-
+   final noti= await fcm.requestPermission();
+ 
     fcm.subscribeToTopic('Chat');
   }
 

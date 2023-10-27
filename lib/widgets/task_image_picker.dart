@@ -16,8 +16,6 @@ class _TaskImagePickerState extends State<TaskImagePicker> {
   void _pickImage() async {
     final pickedImage = await ImagePicker().pickImage(
       source: ImageSource.camera,
-      imageQuality: 50,
-      maxWidth: 50,
     );
 
     if (pickedImage == null) {
@@ -36,6 +34,7 @@ class _TaskImagePickerState extends State<TaskImagePicker> {
       height: 33,
       width: 33,
       child: FloatingActionButton(
+        heroTag: 'sslick',
         backgroundColor: const Color.fromARGB(255, 182, 215, 239),
         elevation: 1.9,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
