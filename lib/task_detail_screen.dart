@@ -118,7 +118,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
       print('the status is here $_enteredstatus');
 
       final theDevicetoken = FirebaseMessaging.instance;
-      final token = await theDevicetoken.requestPermission();
+      await theDevicetoken.requestPermission();
 
       final updatingDevicetoken = await theDevicetoken.getToken();
 

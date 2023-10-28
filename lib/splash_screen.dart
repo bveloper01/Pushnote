@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -7,11 +8,21 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 204, 220, 235),
+        leading: IconButton(
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+            },
+            icon: const Icon(Icons.arrow_back)),
+      ),
       body: Center(
-        child: SizedBox(
-          child: FittedBox(
+        child: Container(
+          padding: const EdgeInsets.only(bottom: 60),
+          child: const FittedBox(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image(
@@ -49,7 +60,7 @@ class SplashScreen extends StatelessWidget {
           ),
         ),
       ),
-      backgroundColor: Color.fromARGB(255, 204, 220, 235),
+      backgroundColor: const Color.fromARGB(255, 204, 220, 235),
     );
   }
 }

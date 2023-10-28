@@ -82,18 +82,6 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Column(
         children: [
-          // Container(
-          //   color: const Color.fromARGB(255, 204, 220, 235),
-          //   child: Container(
-          //     decoration: BoxDecoration(
-          //         color: Color.fromARGB(255, 225, 232, 238),
-          //         borderRadius: BorderRadius.circular(100)),
-          //     height: 40,
-          //     margin:
-          //         const EdgeInsets.only(left: 35, right: 35, top: 5, bottom: 8),
-          //     child: const Center(child: Text('Search')),
-          //   ),
-          // ),
           const SizedBox(
             height: 10,
           ),
@@ -108,7 +96,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     elevation: 2.5,
                     color: Colors.white.withOpacity(1),
                     child: SizedBox(
-                      height: 70,
+                      height: 80,
                       child: Center(
                         child: ListTile(
                           onTap: () {
@@ -120,7 +108,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             );
                           },
                           leading: const CircleAvatar(
-                            radius: 40,
+                            radius: 35,
                             backgroundColor: Colors.white,
                             foregroundImage: AssetImage(
                               'images/workspace.png',
@@ -128,7 +116,8 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           title: const Text(
                             'Workspace Nexus',
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(
+                                fontSize: 17, fontWeight: FontWeight.w600),
                           ),
                         ),
                       ),

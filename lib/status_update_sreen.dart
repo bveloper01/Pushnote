@@ -10,8 +10,6 @@ class TaskStatusListPage extends StatefulWidget {
 class _TaskStatusListPageState extends State<TaskStatusListPage> {
   @override
   Widget build(BuildContext context) {
-    Color sign = Colors.grey;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -30,11 +28,15 @@ class _TaskStatusListPageState extends State<TaskStatusListPage> {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Text('No data available');
+            return const Center(
+                child: Text(
+              'No data available',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ));
           } else {
             return ListView.builder(
               itemCount: snapshot.data!.docs.length,
@@ -45,7 +47,7 @@ class _TaskStatusListPageState extends State<TaskStatusListPage> {
 
                 return Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(color: Colors.black12),
+                      side: const BorderSide(color: Colors.black12),
                       borderRadius: BorderRadius.circular(20)),
                   margin: const EdgeInsets.only(
                     top: 10,
@@ -58,17 +60,29 @@ class _TaskStatusListPageState extends State<TaskStatusListPage> {
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Task Name: ${item['Tname']}'),
+                        Text(
+                          'Task Name: ${item['Tname']}',
+                          style: const TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.w500),
+                        ),
                         const SizedBox(
                           height: 5,
                         ),
-                        Text('Current Status: ${item['current_status']}'),
+                        Text(
+                          'Current Status: ${item['current_status']}',
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w500),
+                        ),
                         const SizedBox(
                           height: 5,
                         ),
                       ],
                     ),
-                    subtitle: Text('Due Date: $formattedDueDate'),
+                    subtitle: Text(
+                      'Due Date: $formattedDueDate',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
                     children: [
                       Align(
                         alignment: Alignment.topLeft,
@@ -76,22 +90,25 @@ class _TaskStatusListPageState extends State<TaskStatusListPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Who Updated: ${item['who updated']}',
-                              style: const TextStyle(fontSize: 14),
+                              'Status updated by: ${item['who updated']}',
+                              style: const TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.w500),
                             ),
                             const SizedBox(
                               height: 5,
                             ),
                             Text(
-                              'Role:  ${item['role']}',
-                              style: const TextStyle(fontSize: 14),
+                              'Role: ${item['role']}',
+                              style: const TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.w500),
                             ),
                             const SizedBox(
                               height: 5,
                             ),
                             Text(
                               'Task Status: ${item['Tname status']} ',
-                              style: const TextStyle(fontSize: 14),
+                              style: const TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),

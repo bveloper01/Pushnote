@@ -12,16 +12,16 @@ class _NoficationScreenState extends State<NoficationScreen> {
   // Dummy notification data
   final List<Map<String, String>> notifications = [
     {
-      'title': 'Created Task',
-      'subtitle': 'A task has been assiged to you',
+      'title': 'Task status updated',
+      'subtitle': 'You received a status update',
     },
     {
-      'title': 'Created Task',
-      'subtitle': 'A task has been assiged to you',
+      'title': 'Task status updated',
+      'subtitle': 'You received a status update',
     },
     {
       'title': 'Text Message',
-      'subtitle': 'Text message Workspace Nexus',
+      'subtitle': 'Text message from Workspace Nexus',
     },
     {
       'title': 'Text Message',
@@ -53,7 +53,7 @@ class _NoficationScreenState extends State<NoficationScreen> {
           final notification = notifications[index];
           return Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(color: Colors.black12),
+                side: const BorderSide(color: Colors.black12),
                 borderRadius: BorderRadius.circular(20)),
             margin: const EdgeInsets.only(
               top: 10,
@@ -61,9 +61,17 @@ class _NoficationScreenState extends State<NoficationScreen> {
               right: 10,
             ),
             child: ListTile(
-              title: Text(notification['title'] ?? ''),
-              subtitle: Text(notification['subtitle'] ?? ''),
-              trailing: Icon(Icons.notifications_active),
+              title: Text(
+                notification['title'] ?? '',
+                style:
+                    const TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+              ),
+              subtitle: Text(
+                notification['subtitle'] ?? '',
+                style:
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              ),
+              trailing: const Icon(Icons.notifications_active),
               onTap: () {
                 // Handle tap on the notification item
               },
