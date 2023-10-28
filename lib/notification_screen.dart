@@ -2,31 +2,74 @@ import 'package:flutter/material.dart';
 import 'package:push_drive/widgets/drawer.dart';
 
 class NoficationScreen extends StatefulWidget {
-  const NoficationScreen({super.key});
+  const NoficationScreen({Key? key}) : super(key: key);
 
   @override
   State<NoficationScreen> createState() => _NoficationScreenState();
 }
 
 class _NoficationScreenState extends State<NoficationScreen> {
+  // Dummy notification data
+  final List<Map<String, String>> notifications = [
+    {
+      'title': 'Created Task',
+      'subtitle': 'A task has been assiged to you',
+    },
+    {
+      'title': 'Created Task',
+      'subtitle': 'A task has been assiged to you',
+    },
+    {
+      'title': 'Text Message',
+      'subtitle': 'Text message Workspace Nexus',
+    },
+    {
+      'title': 'Text Message',
+      'subtitle': 'Text message from Workspace Nexus',
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const MainDrawer(),
       appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 196, 219, 237),
-          toolbarHeight: 68,
-          centerTitle: true,
-          title: const Text(
-            'Notificatons',
-            style: TextStyle(
-                color: Color.fromARGB(255, 23, 23, 23),
-                fontSize: 22,
-                fontWeight: FontWeight.w600),
-          )),
+        backgroundColor: const Color.fromARGB(255, 196, 219, 237),
+        toolbarHeight: 68,
+        centerTitle: true,
+        title: const Text(
+          'Notifications',
+          style: TextStyle(
+            color: Color.fromARGB(255, 23, 23, 23),
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
       backgroundColor: Colors.white,
-      body: const Center(
-        child: Text("Notifications"),
+      body: ListView.builder(
+        itemCount: notifications.length,
+        itemBuilder: (BuildContext context, int index) {
+          final notification = notifications[index];
+          return Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(color: Colors.black12),
+                borderRadius: BorderRadius.circular(20)),
+            margin: const EdgeInsets.only(
+              top: 10,
+              left: 10,
+              right: 10,
+            ),
+            child: ListTile(
+              title: Text(notification['title'] ?? ''),
+              subtitle: Text(notification['subtitle'] ?? ''),
+              trailing: Icon(Icons.notifications_active),
+              onTap: () {
+                // Handle tap on the notification item
+              },
+            ),
+          );
+        },
       ),
     );
   }

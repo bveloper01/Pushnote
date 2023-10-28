@@ -37,7 +37,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   bool isupdating = false;
   String _enteredstatus = '';
 
-  var newday = 'In Progress';
+  var newday = 'In Not started';
   var mystatus = 'Doing';
 
   void skillBasedMatching() async {
@@ -62,21 +62,36 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   void initState() {
     skillBasedMatching();
     super.initState();
-    loadSelectedStatus(); // Load the saved status when the page is initialized
+    loadSelectedStatus(widget.taskName);
+    loadmyStatus(
+        widget.taskName); // Load the saved status when the page is initialized
   }
 
   // Load the selected status from shared preferences
-  Future<void> loadSelectedStatus() async {
+
+  Future<void> loadSelectedStatus(String taskName) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      newday = prefs.getString('newday') ?? 'In Progress';
+      newday = prefs.getString('status_$taskName') ?? 'Not started';
     });
   }
 
   // Save the selected status to shared preferences
-  Future<void> saveSelectedStatus(String status) async {
+  Future<void> saveSelectedStatus(String taskName, String status) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('newday', status);
+    await prefs.setString('status_$taskName', status);
+  }
+
+  Future<void> loadmyStatus(String taskName) async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      mystatus = prefs.getString('mstatus_$taskName') ?? 'Doing';
+    });
+  }
+
+  Future<void> savemyStatus(String taskName, String mstatus) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('mstatus_$taskName', mstatus);
   }
 
   // Handle the submit button press
@@ -107,12 +122,10 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
 
       final updatingDevicetoken = await theDevicetoken.getToken();
 
-      await FirebaseFirestore.instance
-          .collection('taskstatus')
-          .doc(widget.taskName)
-          .set({
+      await FirebaseFirestore.instance.collection('taskstatus').add({
         'Tname': widget.taskName,
         'Tname status': _enteredstatus,
+        'when updated': DateTime.now(),
         'Tdue_date': widget.taskdate,
         'who updated': whoUpdated,
         'role': role,
@@ -145,14 +158,13 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
       setState(() {
         isupdating = false;
       });
-
       // Handle the error as needed.
     }
 
-    saveSelectedStatus(newday);
+    saveSelectedStatus(widget.taskName, newday);
+    savemyStatus(widget.taskName, mystatus);
     setState(() {
       statusformKey.currentState!.reset();
-      // Reset priority to default
     });
   }
 
@@ -160,6 +172,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   Widget build(BuildContext context) {
     String formattedDueDate = DateFormat.yMMMMEEEEd().format(widget.taskdate);
     Color saiyan = Colors.grey;
+    Color saiyans = Colors.grey;
 
     Uri? docuri = Uri.parse(widget.taskdoc);
     Uri? uri = Uri.parse(widget.tasklink);
@@ -184,6 +197,16 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
       saiyan = const Color.fromARGB(255, 255, 221, 83);
     } else {
       saiyan = const Color.fromARGB(210, 140, 225, 104);
+    }
+
+    if (newday == 'In Progress') {
+      saiyans = const Color.fromARGB(255, 177, 206, 252);
+    } else if (newday == 'Not started') {
+      saiyans = Colors.grey;
+    } else if (newday == 'Blocked') {
+      saiyans = const Color.fromARGB(255, 255, 221, 83);
+    } else {
+      saiyans = const Color.fromARGB(210, 140, 225, 104);
     }
 
     return Scaffold(
@@ -323,7 +346,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: const Text(
-                      'The person',
+                      'Shivansh Gupta',
                       style: TextStyle(
                           color: Color.fromARGB(255, 23, 23, 23),
                           fontSize: 17,
@@ -358,69 +381,117 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                const Text(
-                  'Status',
-                  style: TextStyle(
-                      color: Color.fromARGB(255, 23, 23, 23),
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(width: 15),
-                ChoiceChip(
-                  showCheckmark: false,
-                  label: const Text('In Progress',
-                      style:
-                          TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                  selected: newday == 'In Progress',
-                  selectedColor: const Color.fromARGB(255, 177, 206, 252),
-                  onSelected: (value) {
-                    setState(() {
-                      newday = 'In Progress';
-                    });
-                  },
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                ChoiceChip(
-                  showCheckmark: false,
-                  label: const Text('Blocked',
-                      style:
-                          TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                  selected: newday == 'Blocked',
-                  selectedColor: const Color.fromARGB(255, 255, 221, 83),
-                  onSelected: (value) {
-                    setState(() {
-                      newday = 'Blocked';
-                    });
-                  },
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                ChoiceChip(
-                  showCheckmark: false,
-                  label: const Text('Completed',
-                      style:
-                          TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                  selected: newday == 'Completed',
-                  selectedColor: const Color.fromARGB(210, 140, 225, 104),
-                  onSelected: (value) {
-                    setState(() {
-                      newday = 'Completed';
-                    });
-                  },
-                ),
-              ],
-            ),
+            if (!statusrole) const SizedBox(height: 20),
+            if (!statusrole)
+              Row(
+                children: [
+                  const Text(
+                    'Status',
+                    style: TextStyle(
+                        color: Color.fromARGB(255, 23, 23, 23),
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(width: 30),
+                  Container(
+                    decoration: BoxDecoration(
+                        color: saiyans, borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.all(7),
+                    child: Text(
+                      newday,
+                      style: const TextStyle(
+                        color: Color.fromARGB(255, 23, 23, 23),
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             if (statusrole)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Status',
+                    style: TextStyle(
+                        color: Color.fromARGB(255, 23, 23, 23),
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 3),
+                  FittedBox(
+                    child: Row(
+                      children: [
+                        ChoiceChip(
+                          showCheckmark: false,
+                          label: const Text('Not started',
+                              style: TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.w600)),
+                          selected: newday == 'Not started',
+                          selectedColor:
+                              const Color.fromARGB(255, 177, 206, 252),
+                          onSelected: (value) {
+                            setState(() {
+                              newday = 'Not started';
+                            });
+                          },
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        ChoiceChip(
+                          showCheckmark: false,
+                          label: const Text('In Progress',
+                              style: TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.w600)),
+                          selected: newday == 'In Progress',
+                          selectedColor:
+                              const Color.fromARGB(255, 177, 206, 252),
+                          onSelected: (value) {
+                            setState(() {
+                              newday = 'In Progress';
+                            });
+                          },
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        ChoiceChip(
+                          showCheckmark: false,
+                          label: const Text('Blocked',
+                              style: TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.w600)),
+                          selected: newday == 'Blocked',
+                          selectedColor:
+                              const Color.fromARGB(255, 255, 221, 83),
+                          onSelected: (value) {
+                            setState(() {
+                              newday = 'Blocked';
+                            });
+                          },
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        ChoiceChip(
+                          showCheckmark: false,
+                          label: const Text('Completed',
+                              style: TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.w600)),
+                          selected: newday == 'Completed',
+                          selectedColor:
+                              const Color.fromARGB(210, 140, 225, 104),
+                          onSelected: (value) {
+                            setState(() {
+                              newday = 'Completed';
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 7),
                   Row(
                     children: [
                       const Text(

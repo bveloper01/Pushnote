@@ -13,11 +13,27 @@ class OverViewGridItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(20)),
       elevation: 4,
       child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-            color: category.color, borderRadius: BorderRadius.circular(20)),
-        child: Text(category.title),
-      ),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+              color: category.color, borderRadius: BorderRadius.circular(20)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                category.title.toString(),
+                style:
+                    const TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(
+                height: 3,
+              ),
+              Text(
+                category.subtitle,
+                style:
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              ),
+            ],
+          )),
     );
   }
 }

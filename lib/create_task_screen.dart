@@ -29,9 +29,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   var selmedium = 'Medium';
 
   List<String> selectedValues = []; // Keep track of selected values
-  String dropdown = 'Dog';
+  String dropdown = 'Select';
 
-  String dropdownValue = 'Dog';
+  String dropdownValue = 'Select';
 
   void _submit() async {
     final isValid = _createformKey.currentState!.validate();
@@ -415,8 +415,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                             // Step 3.
                             value: dropdownValue,
                             // Step 4.
-                            items: <String>['Dog', 'Cat', 'Tiger', 'Lion']
-                                .map<DropdownMenuItem<String>>((String value) {
+                            items: <String>[
+                              'Select',
+                              'Shivansh Gupta',
+                              'Anmol Kaushal'
+                            ].map<DropdownMenuItem<String>>((String value) {
                               return DropdownMenuItem<String>(
                                 value: value,
                                 child: Text(
@@ -527,13 +530,8 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                             DropdownButton<String>(
                               value: dropdown,
                               items: <String>[
-                                'Dog',
-                                'Cat',
-                                'Tiger',
-                                'Lion',
-                                'Rhino',
-                                'Fox',
-                                'Panther'
+                                'Select',
+                                'Anmol Kaushal'
                               ].map<DropdownMenuItem<String>>((String value) {
                                 return DropdownMenuItem<String>(
                                   value: value,

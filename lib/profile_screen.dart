@@ -96,20 +96,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     padding: const EdgeInsets.only(left: 10, top: 30),
                     child: Column(
                       children: [
-                        if (!rolecolor)
-                          ListTile(
-                            onTap: () {},
-                            leading: const Icon(
-                              Icons.report_problem,
-                              color: Colors.black54,
-                              size: 22,
-                            ),
-                            title: const Text(
-                              'Raise a ticket',
-                              style: TextStyle(
-                                  fontSize: 18, color: Colors.black54),
-                            ),
-                          ),
                         ListTile(
                           onTap: () {},
                           leading: const Icon(
