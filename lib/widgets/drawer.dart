@@ -1,9 +1,39 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:push_drive/status_update_sreen.dart';
 
-class MainDrawer extends StatelessWidget {
+class MainDrawer extends StatefulWidget {
   const MainDrawer({super.key});
+
+  @override
+  State<MainDrawer> createState() => _MainDrawerState();
+}
+
+class _MainDrawerState extends State<MainDrawer> {
+  var designation = false;
+
+  void getdata() async {
+    final devtoken = FirebaseAuth.instance.currentUser!;
+    final currUsertoken = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(devtoken.uid)
+        .get();
+    final role = currUsertoken.data()!['role'];
+    setState(() {
+      if (role == 'Employee') {
+        designation = false;
+      } else {
+        designation = true;
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    getdata();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,22 +71,23 @@ class MainDrawer extends StatelessWidget {
                 )),
             Column(
               children: [
-                ListTile(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TaskStatusListPage()));
-                  },
-                  leading: const Icon(
-                    Icons.update,
-                    size: 22,
+                if (designation)
+                  ListTile(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TaskStatusListPage()));
+                    },
+                    leading: const Icon(
+                      Icons.update,
+                      size: 22,
+                    ),
+                    title: const Text(
+                      'Task status updates',
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
-                  title: const Text(
-                    'Task status updates',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
                 ListTile(
                   onTap: () {
                     FirebaseAuth.instance.signOut();

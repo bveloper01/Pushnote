@@ -37,8 +37,8 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   bool isupdating = false;
   String _enteredstatus = '';
 
-  var newday = 'In Not started';
-  var mystatus = 'Doing';
+  var newday = 'Not started';
+  var mystatus = 'To do';
 
   void skillBasedMatching() async {
     final forUserName = FirebaseAuth.instance.currentUser!;
@@ -56,7 +56,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
         statusrole = false;
       }
     });
-  }
+}
 
   @override
   void initState() {
@@ -85,7 +85,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   Future<void> loadmyStatus(String taskName) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      mystatus = prefs.getString('mstatus_$taskName') ?? 'Doing';
+      mystatus = prefs.getString('mstatus_$taskName') ?? 'To do';
     });
   }
 
@@ -199,10 +199,10 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
       saiyan = const Color.fromARGB(210, 140, 225, 104);
     }
 
-    if (newday == 'In Progress') {
-      saiyans = const Color.fromARGB(255, 177, 206, 252);
-    } else if (newday == 'Not started') {
+    if (newday == 'Not started') {
       saiyans = Colors.grey;
+    } else if (newday == 'In Progress') {
+      saiyans = const Color.fromARGB(255, 177, 206, 252);
     } else if (newday == 'Blocked') {
       saiyans = const Color.fromARGB(255, 255, 221, 83);
     } else {
@@ -408,6 +408,10 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 ],
               ),
             if (statusrole)
+              const SizedBox(
+                height: 2,
+              ),
+            if (statusrole)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -419,7 +423,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                         fontSize: 17,
                         fontWeight: FontWeight.w600),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 5),
                   FittedBox(
                     child: Row(
                       children: [
@@ -429,8 +433,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                               style: TextStyle(
                                   fontSize: 12, fontWeight: FontWeight.w600)),
                           selected: newday == 'Not started',
-                          selectedColor:
-                              const Color.fromARGB(255, 177, 206, 252),
+                          selectedColor: Colors.grey,
                           onSelected: (value) {
                             setState(() {
                               newday = 'Not started';
@@ -491,7 +494,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 7),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       const Text(
@@ -524,7 +527,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                             style: TextStyle(
                                 fontSize: 12, fontWeight: FontWeight.w600)),
                         selected: mystatus == 'Doing',
-                        selectedColor: Color.fromARGB(255, 150, 236, 246),
+                        selectedColor: const Color.fromARGB(255, 150, 236, 246),
                         onSelected: (value) {
                           setState(() {
                             mystatus = 'Doing';
@@ -553,7 +556,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                   const Text('Task update',
                       style:
                           TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 7),
                   Form(
                     key: statusformKey,
                     child: TextFormField(
@@ -561,8 +564,10 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                       readOnly: false,
                       obscureText: false,
                       validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please enter today\'s status';
+                        if (value == null ||
+                            value.trim().isEmpty ||
+                            value.trim().length < 4) {
+                          return 'Enter at least 4 characters';
                         }
                         return null;
                       },
@@ -716,7 +721,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
               ),
             if (isupdating)
               const SizedBox(
-                height: 30,
+                height: 32,
               ),
             if (isupdating)
               const Center(

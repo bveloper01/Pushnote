@@ -121,7 +121,7 @@ class _EmployerTaskListState extends State<EmployerTaskList> {
 
                     return Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(color: Colors.black12),
+                          side: const BorderSide(color: Colors.black12),
                           borderRadius: BorderRadius.circular(20)),
                       margin: const EdgeInsets.only(
                         top: 10,

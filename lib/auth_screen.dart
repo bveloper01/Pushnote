@@ -348,7 +348,6 @@ class _AuthScreenState extends State<AuthScreen> {
                           enableSuggestions: false,
                           autocorrect: false,
                           textCapitalization: TextCapitalization.words,
-                          keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                             labelText: 'Full Name',
                             labelStyle: const TextStyle(color: Colors.black),

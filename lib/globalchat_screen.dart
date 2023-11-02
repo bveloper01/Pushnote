@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:push_drive/widgets/chat_messages.dart';
+import 'package:push_drive/widgets/drawer.dart';
 import 'package:push_drive/widgets/new_messages.dart';
 
 class GlobalChatScreen extends StatefulWidget {
@@ -16,7 +17,7 @@ class _GlobalChatScreenState extends State<GlobalChatScreen> {
   void setUpPushNotification() async {
     final fcm = FirebaseMessaging.instance;
     await fcm.requestPermission();
- 
+
     fcm.subscribeToTopic('Chat');
   }
 
@@ -31,6 +32,7 @@ class _GlobalChatScreenState extends State<GlobalChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const MainDrawer(),
       appBar: AppBar(
         surfaceTintColor: Colors.white,
         backgroundColor: const Color.fromARGB(255, 196, 219, 237),

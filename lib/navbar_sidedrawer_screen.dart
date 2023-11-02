@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:push_drive/chat_screen.dart';
+import 'package:push_drive/globalchat_screen.dart';
 import 'package:push_drive/home_screen.dart';
 import 'package:push_drive/notification_screen.dart';
 import 'package:push_drive/widgets/drawer.dart';
@@ -15,7 +15,7 @@ class _tabScreensState extends State<tabScreens> {
   int _selectedPageIndex = 0;
   final screens = const [
     HomeScreen(),
-    ChatScreen(),
+    GlobalChatScreen(),
     NoficationScreen(),
   ];
 

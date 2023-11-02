@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,10 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  final _bugformKey = GlobalKey<FormState>();
+  bool isreporting = false;
+  String enteredbugname = '';
+  String enteredbugdetail = '';
   String dName = '';
   var rolecolor = true;
   var designation = '';
@@ -35,6 +41,232 @@ class _ProfilePageState extends State<ProfilePage> {
       designation = role;
       diss = profileImage;
     });
+  }
+
+  void _submitbugreport() async {
+    final isValid = _bugformKey.currentState!.validate();
+    if (!isValid) {
+      return;
+    }
+    _bugformKey.currentState!.save();
+    setState(() {
+      isreporting = true;
+    });
+    try {
+      await FirebaseFirestore.instance.collection('Bug reports').add({
+        'Bug title': enteredbugname,
+        'Bug description': enteredbugdetail,
+        'date': DateTime.now(),
+        'username': dName,
+        'role': designation,
+      });
+
+      setState(() {
+        isreporting = false;
+        _bugformKey.currentState!.reset();
+        Navigator.of(context).pop();
+      });
+    } catch (error) {
+      ScaffoldMessenger.of(context)
+          .clearSnackBars(); // to clear any existing snackbars
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.blueAccent,
+          duration: Duration(seconds: 1),
+          content: Center(
+            child: Text(
+              'Something went wrong',
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+        ),
+      );
+      setState(() {
+        isreporting = false;
+      });
+    }
+  }
+
+  void showoverlay() {
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (ctx) {
+          return SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.only(
+                  top: 20,
+                  left: 20,
+                  right: 20,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 14),
+              child: Form(
+                  key: _bugformKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 10),
+                      const Center(
+                        child: Text(
+                          'Report your bug',
+                          style: TextStyle(
+                              color: Color.fromARGB(255, 23, 23, 23),
+                              fontSize: 21,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Title',
+                        style: TextStyle(
+                            color: Color.fromARGB(255, 23, 23, 23),
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 5),
+                      TextFormField(
+                        autofocus: true,
+                        enabled: true,
+                        readOnly: false,
+                        obscureText: false,
+                        validator: (value) {
+                          if (value == null ||
+                              value.trim().isEmpty ||
+                              value.trim().length < 2) {
+                            return 'Please enter a valid title';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          enteredbugname = value!;
+                        },
+                        autocorrect: true,
+                        textCapitalization: TextCapitalization.words,
+                        decoration: InputDecoration(
+                          labelStyle: const TextStyle(color: Colors.black),
+                          hintText: 'Enter title here',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.black,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.black,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          filled: true,
+                          contentPadding: const EdgeInsetsDirectional.fromSTEB(
+                              16, 24, 0, 24),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Describe your issue',
+                        style: TextStyle(
+                            color: Color.fromARGB(255, 23, 23, 23),
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 5),
+                      TextFormField(
+                        enabled: true,
+                        readOnly: false,
+                        obscureText: false,
+                        validator: (value) {
+                          if (value == null ||
+                              value.trim().isEmpty ||
+                              value.trim().length < 5) {
+                            return 'Please enter a valid description';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          enteredbugdetail = value!;
+                        },
+                        autocorrect: false,
+                        decoration: InputDecoration(
+                          labelStyle: const TextStyle(color: Colors.black),
+                          hintText: 'Enter your description here',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.black,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.black,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          filled: true,
+                          contentPadding: const EdgeInsetsDirectional.fromSTEB(
+                              16, 24, 0, 24),
+                        ),
+                      ),
+                      const SizedBox(height: 27),
+                      if (isreporting)
+                        const Center(
+                          child: CircularProgressIndicator(
+                            backgroundColor: Colors.white,
+                            strokeWidth: 2.5,
+                          ),
+                        ),
+                      if (!isreporting)
+                        ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blueAccent),
+                            onPressed: _submitbugreport,
+                            child: const SizedBox(
+                              height: 45,
+                              width: double.infinity,
+                              child: Center(
+                                child: Text(
+                                  'Submit Report',
+                                  style: TextStyle(
+                                      fontSize: 16.5, color: Colors.white),
+                                ),
+                              ),
+                            )),
+                    ],
+                  )),
+            ),
+          );
+        });
   }
 
   @override
@@ -73,23 +305,27 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 27),
-                    child: Text(dName,
-                        style: TextStyle(
-                            color: rolecolor
-                                ? const Color.fromARGB(255, 23, 23, 23)
-                                : Colors.black87,
-                            fontSize: 26,
-                            fontWeight: FontWeight.w500)),
+                    child: Center(
+                      child: Text(dName,
+                          style: TextStyle(
+                              color: rolecolor
+                                  ? const Color.fromARGB(255, 23, 23, 23)
+                                  : Colors.black87,
+                              fontSize: 26,
+                              fontWeight: FontWeight.w500)),
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 7),
-                    child: Text(designation,
-                        style: TextStyle(
-                            color: rolecolor
-                                ? const Color.fromARGB(255, 23, 23, 23)
-                                : Colors.black54,
-                            fontSize: 19,
-                            fontWeight: FontWeight.w400)),
+                    child: Center(
+                      child: Text(designation,
+                          style: TextStyle(
+                              color: rolecolor
+                                  ? const Color.fromARGB(255, 23, 23, 23)
+                                  : Colors.black54,
+                              fontSize: 19,
+                              fontWeight: FontWeight.w400)),
+                    ),
                   ),
                   Container(
                     height: 460,
@@ -97,7 +333,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Column(
                       children: [
                         ListTile(
-                          onTap: () {},
+                          onTap: showoverlay,
                           leading: const Icon(
                             Icons.bug_report_rounded,
                             color: Colors.black54,
@@ -116,7 +352,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const Padding(
                 padding: EdgeInsets.only(bottom: 20),
-                child: Text('vOct.0',
+                child: Text('vNov.1',
                     style: TextStyle(fontSize: 15, color: Colors.black54)),
               ),
             ],

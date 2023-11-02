@@ -28,16 +28,47 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   File? _theselectedFile;
   var selmedium = 'Medium';
 
-  List<String> selectedValues = []; // Keep track of selected values
-  String dropdown = 'Select';
-
   String dropdownValue = 'Select';
+  String dropdown = 'Select';
+  List<String> allEmployees = [];
+  List<String> selectedEmployees = [];
+  List<String> addedMembers = [];
 
   void _submit() async {
     final isValid = _createformKey.currentState!.validate();
 
-    if (!isValid || chosenDate == null) {
+    if (!isValid || chosenDate == null || selectedEmployees.isEmpty) {
       if (chosenDate == null) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.blueAccent,
+            duration: Duration(seconds: 1),
+            content: Center(
+              child: Text(
+                'Please select a date',
+                style: TextStyle(fontSize: 14),
+              ),
+            ),
+          ),
+        );
+      }
+      if (selectedEmployees.isEmpty) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.blueAccent,
+            duration: Duration(seconds: 1),
+            content: Center(
+              child: Text(
+                'Please select an employee',
+                style: TextStyle(fontSize: 14),
+              ),
+            ),
+          ),
+        );
+      }
+      if (chosenDate == null && selectedEmployees.isEmpty) {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -97,6 +128,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         'Task name': _enteredtaskname,
         'Task details': _enteredtaskdetails,
         'due_date': chosenDate,
+        if (selectedEmployees.isNotEmpty)
+          'selected_employee': selectedEmployees,
+        if (addedMembers.isNotEmpty) 'added_employee': addedMembers,
         if (taskimgURL != null) 'task_img': taskimgURL,
         if (linktextfiels) 'task_link': _enteredlink,
         if (taskdocURL != null) 'task_doc': taskdocURL,
@@ -109,6 +143,12 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       setState(() {
         isCreating = false;
         Navigator.of(context).pop();
+        dropdown = 'Select';
+        dropdownValue = 'Select';
+        _createformKey.currentState!.reset();
+        chosenDate = null;
+        selmedium = 'Medium';
+        _theselectedImage = null;
       });
     } catch (e) {
       print('Error: $e');
@@ -132,12 +172,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
 
       // Handle the error as needed.
     }
+  }
 
+  void resetDropdownValue() {
     setState(() {
-      _createformKey.currentState!.reset();
-      chosenDate = null;
-      selmedium = 'Medium';
-      _theselectedImage = null; // Reset priority to default
+      dropdown = 'Select';
     });
   }
 
@@ -176,6 +215,24 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
 
       // Request focus on the Title TextField
     }); //furture can also be used in http requests where you wait for response from the user
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Step 1: Retrieve a list of all users with the role 'Employee'
+    // You need to replace 'users' with the actual Firestore collection name.
+    FirebaseFirestore.instance
+        .collection('users')
+        .where('role', isEqualTo: 'Employee')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      setState(() {
+        allEmployees =
+            querySnapshot.docs.map((doc) => doc['username'] as String).toList();
+      });
+    });
   }
 
   @override
@@ -410,32 +467,32 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                         ),
                         padding: const EdgeInsets.fromLTRB(15, 5, 10, 5),
                         child: FittedBox(
-                          child: DropdownButton<String>(
-                            padding: const EdgeInsets.only(left: 5),
-                            // Step 3.
-                            value: dropdownValue,
-                            // Step 4.
-                            items: <String>[
-                              'Select',
-                              'Shivansh Gupta',
-                              'Anmol Kaushal'
-                            ].map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: const TextStyle(fontSize: 18),
-                                ),
-                              );
-                            }).toList(),
-                            // Step 5.
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                dropdownValue = newValue!;
-                              });
-                            },
-                          ),
-                        ),
+                            child: DropdownButton<String>(
+                          value: dropdownValue,
+                          items: [
+                            'Select',
+                            ...allEmployees.where(
+                                (employee) => !addedMembers.contains(employee))
+                          ].map<DropdownMenuItem<String>>((value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: const TextStyle(fontSize: 18),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              if (newValue != null && newValue != 'Select') {
+                                // Remove the selected value from allEmployees and add it to selectedEmployees
+                                selectedEmployees.clear();
+                                dropdownValue = newValue;
+                                selectedEmployees.add(newValue);
+                              }
+                            });
+                          },
+                        )),
                       ),
                     ),
                   ],
@@ -528,44 +585,47 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                         child: Column(
                           children: [
                             DropdownButton<String>(
-                              value: dropdown,
-                              items: <String>[
-                                'Select',
-                                'Anmol Kaushal'
-                              ].map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(
-                                    value,
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (String? newValue) {
-                                if (newValue != null) {
+                                value: dropdown,
+                                items: [
+                                  'Select',
+                                  ...allEmployees.where((employee) =>
+                                      !selectedEmployees.contains(employee))
+                                ].map<DropdownMenuItem<String>>((value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(
+                                      value,
+                                      style: const TextStyle(fontSize: 18),
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (String? addValue) {
                                   setState(() {
-                                    dropdown = newValue;
-                                    if (!selectedValues.contains(newValue)) {
-                                      selectedValues.add(newValue);
+                                    if (addValue != null &&
+                                        addValue != 'Select' &&
+                                        !selectedEmployees.contains(addValue) &&
+                                        !addedMembers.contains(addValue)) {
+                                      // Remove the selected value from allEmployees and add it to selectedEmployees
+                                      dropdown = addValue;
+                                      addedMembers.add(addValue);
                                     }
                                   });
-                                }
-                              },
-                            ),
+                                }),
                             SingleChildScrollView(
                               reverse: true,
                               scrollDirection: Axis.horizontal,
                               child: Wrap(
                                 spacing: 8.0,
                                 runSpacing: 8.0,
-                                children: selectedValues
+                                children: addedMembers
                                     .map((value) => Chip(
                                           backgroundColor: const Color.fromARGB(
                                               255, 226, 236, 243),
                                           label: Text(value),
                                           onDeleted: () {
                                             setState(() {
-                                              selectedValues.remove(value);
+                                              addedMembers.remove(value);
+                                              resetDropdownValue();
                                             });
                                           },
                                         ))
