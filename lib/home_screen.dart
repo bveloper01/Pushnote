@@ -3,12 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:push_drive/create_task_screen.dart';
-import 'package:push_drive/models/employee_overview_data%20copy.dart';
-import 'package:push_drive/models/employer_overview_data.dart';
 import 'package:push_drive/profile_screen.dart';
 import 'package:push_drive/widgets/drawer.dart';
 import 'package:push_drive/widgets/task_list.dart';
-import 'package:push_drive/widgets/overview_grid_item.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -23,6 +20,14 @@ class _HomeScreenState extends State<HomeScreen> {
   var homedp;
   String homename = '';
   var showbtn = false;
+  int highPriorityCount = 0;
+  int mediumPriorityCount = 0;
+  int lowPriorityCount = 0;
+  int overduePriorityCount = 0;
+  int inProgresCount = 0;
+  int blockedCount = 0;
+  int completedCount = 0;
+  int overdueerCount = 0;
 
   void homeView() async {
     final forUserName = FirebaseAuth.instance.currentUser!;
@@ -46,9 +51,85 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void fetchPriorityCounts() async {
+    // Fetch documents from 'taskdetails' collection
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('taskdetails').get();
+
+    // Reset priority counts
+    highPriorityCount = 0;
+    mediumPriorityCount = 0;
+    lowPriorityCount = 0;
+    overduePriorityCount = 0;
+
+    // Iterate through documents and count priorities
+    querySnapshot.docs.forEach((DocumentSnapshot document) {
+      Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
+      // Check the priority field and update the corresponding count
+      String priority = data['Priority'];
+      switch (priority) {
+        case 'High':
+          highPriorityCount++;
+          break;
+        case 'Medium':
+          mediumPriorityCount++;
+          break;
+        case 'Low':
+          lowPriorityCount++;
+          break;
+        case 'Overdue':
+          overduePriorityCount++;
+          break;
+        default:
+          break;
+      }
+    });
+
+    // Update the state to trigger a rebuild with the updated counts
+    setState(() {});
+
+    QuerySnapshot querytwoSnapshot =
+        await FirebaseFirestore.instance.collection('taskstatus').get();
+
+    // Reset priority counts
+    inProgresCount = 0;
+    blockedCount = 0;
+    completedCount = 0;
+    overdueerCount = 0;
+
+    // Iterate through documents and count priorities
+    querytwoSnapshot.docs.forEach((DocumentSnapshot document) {
+      Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
+      // Check the priority field and update the corresponding count
+      String current_status = data['current_status'];
+      switch (current_status) {
+        case 'In Progress':
+          inProgresCount++;
+          break;
+        case 'Blocked':
+          blockedCount++;
+          break;
+        case 'Completed':
+          completedCount++;
+          break;
+        case 'Overdue':
+          overdueerCount++;
+          break;
+        default:
+          break;
+      }
+    });
+
+    // Update the state to trigger a rebuild with the updated counts
+    setState(() {});
+  }
+
   @override
   void initState() {
     homeView();
+    fetchPriorityCounts();
     super.initState();
   }
 
@@ -193,9 +274,114 @@ class _HomeScreenState extends State<HomeScreen> {
                                 crossAxisSpacing: 9,
                                 mainAxisSpacing: 10),
                         children: [
-                          if (showbtn)
-                            for (final category in employeeOverview)
-                              OverViewGridItem(category: category)
+                          Container(
+                            padding: const EdgeInsets.only(
+                                top: 8, bottom: 8, left: 15, right: 8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.0),
+                              color:const Color.fromARGB(255, 177, 206, 252),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  inProgresCount.toString(),
+                                  style: const TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                const Text(
+                                  'In Progress',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(
+                                top: 8, bottom: 8, left: 15, right: 8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.0),
+                              color: const Color.fromARGB(250, 245, 188, 91),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  blockedCount.toString(),
+                                  style: const TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                const Text(
+                                  'Blocked',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(
+                                top: 8, bottom: 8, left: 15, right: 8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.0),
+                              color: Color.fromARGB(210, 145, 230, 108),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  completedCount.toString(),
+                                  style: const TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                const Text(
+                                  'Completed',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(
+                                top: 8, bottom: 8, left: 15, right: 8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.0),
+                              color: Color.fromARGB(255, 241, 111, 111),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  overdueerCount.toString(),
+                                  style: const TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                const Text(
+                                  'Overdue',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ],
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -240,11 +426,117 @@ class _HomeScreenState extends State<HomeScreen> {
                             const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
                                 childAspectRatio: 6 / 2.86,
-                                crossAxisSpacing: 9,
+                                crossAxisSpacing: 10,
                                 mainAxisSpacing: 10),
                         children: [
-                          for (final category in employerOverview)
-                            OverViewGridItem(category: category)
+                          Container(
+                            padding: const EdgeInsets.only(
+                                top: 8, bottom: 8, left: 15, right: 8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.0),
+                              color: const Color.fromARGB(255, 247, 124, 124),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  highPriorityCount.toString(),
+                                  style: const TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                const Text(
+                                  'High',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(
+                                top: 8, bottom: 8, left: 15, right: 8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.0),
+                              color: const Color.fromARGB(250, 245, 188, 91),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  mediumPriorityCount.toString(),
+                                  style: const TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                const Text(
+                                  'Medium',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(
+                                top: 8, bottom: 8, left: 15, right: 8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.0),
+                              color: Color.fromARGB(210, 145, 230, 108),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  lowPriorityCount.toString(),
+                                  style: const TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                const Text(
+                                  'Low',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(
+                                top: 8, bottom: 8, left: 15, right: 8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.0),
+                              color: Color.fromARGB(255, 241, 111, 111),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  overduePriorityCount.toString(),
+                                  style: const TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                const Text(
+                                  'Overdue',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 23, 23, 23),
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),

@@ -63,7 +63,7 @@ class _TaskStatusListPageState extends State<TaskStatusListPage> {
                         Text(
                           'Task Name: ${item['Tname']}',
                           style: const TextStyle(
-                              fontSize: 17, fontWeight: FontWeight.w500),
+                              fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(
                           height: 5,

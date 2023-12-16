@@ -10,6 +10,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 class TaskDetailsPage extends StatefulWidget {
   final String taskName;
+  final List<dynamic> addedperson;
+  final String selectedperson;
   final String taskDetails;
   final DateTime taskdate;
   final String taskpriority;
@@ -24,7 +26,9 @@ class TaskDetailsPage extends StatefulWidget {
       required this.taskpriority,
       required this.taskImg,
       required this.tasklink,
-      required this.taskdoc});
+      required this.taskdoc,
+      required this.selectedperson,
+      required this.addedperson});
 
   @override
   State<TaskDetailsPage> createState() => _TaskDetailsPageState();
@@ -56,7 +60,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
         statusrole = false;
       }
     });
-}
+  }
 
   @override
   void initState() {
@@ -191,6 +195,11 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
       _isdocthere = true;
     }
 
+    bool _isaddedmember = false;
+    if (this.widget.addedperson.isNotEmpty) {
+      _isaddedmember = true;
+    }
+
     if (widget.taskpriority == 'High') {
       saiyan = const Color.fromARGB(255, 248, 126, 126);
     } else if (widget.taskpriority == 'Medium') {
@@ -216,7 +225,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
         backgroundColor: const Color.fromARGB(255, 226, 233, 238),
       ),
       body: SingleChildScrollView(
-        reverse: true,
+        // reverse: true,
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,9 +354,9 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                       ),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    child: const Text(
-                      'Shivansh Gupta',
-                      style: TextStyle(
+                    child: Text(
+                      widget.selectedperson,
+                      style: const TextStyle(
                           color: Color.fromARGB(255, 23, 23, 23),
                           fontSize: 17,
                           fontWeight: FontWeight.w600),
@@ -381,6 +390,59 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 ),
               ],
             ),
+            if (_isaddedmember) const SizedBox(height: 20),
+            if (_isaddedmember)
+              Row(
+                children: [
+                  const Text(
+                    'Members',
+                    style: TextStyle(
+                        color: Color.fromARGB(255, 23, 23, 23),
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.only(
+                          left: 9, top: 7.3, bottom: 7.3, right: 9),
+                      alignment: Alignment.centerLeft,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                          color: Colors.black,
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Wrap(
+                          children: widget.addedperson.map((person) {
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 8, bottom: 8, left: 4, right: 4),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color.fromARGB(255, 226, 233, 238),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(person,
+                                    style: const TextStyle(
+                                        color: Color.fromARGB(255, 23, 23, 23),
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w600)),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             if (!statusrole) const SizedBox(height: 20),
             if (!statusrole)
               Row(
@@ -615,7 +677,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 ],
               ),
             if (_isimgthere || _islinkthere || _isdocthere)
-              const SizedBox(height: 18),
+              const SizedBox(height: 19),
             if (_isimgthere || _islinkthere || _isdocthere)
               Row(
                 children: [

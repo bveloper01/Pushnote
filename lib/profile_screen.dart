@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -89,22 +88,23 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void showoverlay() {
     showModalBottomSheet(
+        showDragHandle: true,
         context: context,
         isScrollControlled: true,
         builder: (ctx) {
-          return SingleChildScrollView(
-            child: Container(
-              padding: EdgeInsets.only(
-                  top: 20,
-                  left: 20,
-                  right: 20,
-                  bottom: MediaQuery.of(context).viewInsets.bottom + 14),
-              child: Form(
-                  key: _bugformKey,
+          return Container(
+            // height: MediaQuery.of(context).size.height - 160,
+            padding: EdgeInsets.only(
+                top: 20,
+                left: 20,
+                right: 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 14),
+            child: Form(
+                key: _bugformKey,
+                child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 10),
                       const Center(
                         child: Text(
                           'Report your bug',
@@ -263,8 +263,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             )),
                     ],
-                  )),
-            ),
+                  ),
+                )),
           );
         });
   }

@@ -21,7 +21,5 @@ const employerOverview = [
   Category(
       title: 3, subtitle: 'Low', color: Color.fromARGB(210, 145, 230, 108)),
   Category(
-      title: 1,
-      subtitle: 'Overdue',
-      color: Color.fromARGB(255, 247, 124, 124)),
+      title: 1, subtitle: 'Overdue', color: Color.fromARGB(255, 247, 124, 124)),
 ];

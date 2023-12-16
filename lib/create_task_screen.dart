@@ -639,7 +639,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                   ],
                 ),
                 const SizedBox(
-                  height: 15,
+                  height: 18,
                 ),
                 Row(
                   children: [

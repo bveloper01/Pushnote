@@ -37,8 +37,8 @@ class _EmployerTaskListState extends State<EmployerTaskList> {
               ),
             ),
           ),
-          Container(
-            height: MediaQuery.of(context).size.height - 466,
+          SizedBox(
+            height: MediaQuery.of(context).size.height - 471,
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('taskdetails')
@@ -82,16 +82,8 @@ class _EmployerTaskListState extends State<EmployerTaskList> {
                   );
                 }
 
-                if (!snapshot.hasData) {
-                  return const Center(
-                      child: CircularProgressIndicator(
-                    backgroundColor: Colors.white,
-                    strokeWidth: 2.5,
-                  ));
-                }
-
                 return ListView.builder(
-                  padding: EdgeInsets.only(bottom: 70),
+                  padding: const EdgeInsets.only(bottom: 70),
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
                     var task = snapshot.data!.docs[index];
@@ -104,7 +96,11 @@ class _EmployerTaskListState extends State<EmployerTaskList> {
                     bool haslink =
                         data != null && data.containsKey('task_link');
                     bool hasdoc = data != null && data.containsKey('task_doc');
+                    bool hasmember =
+                        data != null && data.containsKey('added_employee');
                     String taskName = task['Task name'];
+                    String selectedperson =
+                        task['selected_employee'][0].toString();
                     String taskDetails = task['Task details'];
                     String priority = task['Priority'];
                     DateTime dueDate = (task['due_date'] as Timestamp).toDate();
@@ -137,7 +133,10 @@ class _EmployerTaskListState extends State<EmployerTaskList> {
                                 taskName: taskName,
                                 taskDetails: taskDetails,
                                 taskdate: dueDate,
+                                selectedperson: selectedperson,
                                 taskpriority: priority,
+                                addedperson:
+                                    hasmember ? task['added_employee'] : [],
                                 taskImg: hasImage ? task['task_img'] : '',
                                 tasklink: haslink ? task['task_link'] : '',
                                 taskdoc: hasdoc ? task['task_doc'] : '',
@@ -176,21 +175,24 @@ class _EmployerTaskListState extends State<EmployerTaskList> {
                                   Icons.date_range,
                                   size: 22,
                                 ),
-                                Expanded(
-                                    child: Container(
-                                        child: Text(' $formattedDueDate'))),
-                                if (hasImage) const Icon(Icons.image_outlined),
-                                if (haslink)
+                                Expanded(child: Text(' $formattedDueDate')),
+                                if (hasmember) const Icon(Icons.group_outlined),
+                                if (hasImage)
                                   const SizedBox(
                                     width: 5,
                                   ),
-                                if (haslink) const Icon(Icons.link),
+                                if (hasImage) const Icon(Icons.image_outlined),
                                 if (hasdoc)
                                   const SizedBox(
                                     width: 5,
                                   ),
                                 if (hasdoc)
                                   const Icon(Icons.description_outlined),
+                                if (haslink)
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                if (haslink) const Icon(Icons.link),
                               ],
                             ),
 

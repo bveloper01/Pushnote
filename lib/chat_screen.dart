@@ -60,7 +60,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     radius: 23,
                     backgroundColor: Color.fromARGB(255, 223, 249, 250),
                     foregroundImage: AssetImage(
-                      'images/avatar.png',
+                      'Images/avatar.png',
                     ),
                   )
                 : InkWell(
@@ -111,7 +111,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             radius: 35,
                             backgroundColor: Colors.white,
                             foregroundImage: AssetImage(
-                              'images/workspace.png',
+                              'Images/workspace.png',
                             ),
                           ),
                           title: const Text(
