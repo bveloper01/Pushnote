@@ -1,5 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:push_drive/widgets/drawer.dart';
 
 class NoficationScreen extends StatefulWidget {
   const NoficationScreen({Key? key}) : super(key: key);
@@ -32,7 +32,59 @@ class _NoficationScreenState extends State<NoficationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const MainDrawer(),
+      drawer: Drawer(
+        width: 275,
+        surfaceTintColor: Colors.white,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(10), bottomRight: Radius.circular(0)),
+        ),
+        backgroundColor: Colors.white,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const DrawerHeader(
+                  padding: EdgeInsets.only(left: 20, top: 40),
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 196, 219, 237),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.book_rounded,
+                        size: 50,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        'Pushnote',
+                        style: TextStyle(
+                            fontSize: 25, fontWeight: FontWeight.w500),
+                      )
+                    ],
+                  )),
+              Column(
+                children: [
+                  ListTile(
+                    onTap: () {
+                      FirebaseAuth.instance.signOut();
+                    },
+                    leading: const Icon(
+                      Icons.arrow_back_rounded,
+                      size: 22,
+                    ),
+                    title: const Text(
+                      'Signout',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 196, 219, 237),
         toolbarHeight: 68,
@@ -59,35 +111,3 @@ class _NoficationScreenState extends State<NoficationScreen> {
 
 
 
-//  ListView.builder(
-//         itemCount: notifications.length,
-//         itemBuilder: (BuildContext context, int index) {
-//           final notification = notifications[index];
-//           return Card(
-//             shape: RoundedRectangleBorder(
-//                 side: const BorderSide(color: Colors.black12),
-//                 borderRadius: BorderRadius.circular(20)),
-//             margin: const EdgeInsets.only(
-//               top: 10,
-//               left: 10,
-//               right: 10,
-//             ),
-//             child: ListTile(
-//               title: Text(
-//                 notification['title'] ?? '',
-//                 style:
-//                     const TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
-//               ),
-//               subtitle: Text(
-//                 notification['subtitle'] ?? '',
-//                 style:
-//                     const TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
-//               ),
-//               trailing: const Icon(Icons.notifications_active),
-//               onTap: () {
-//                 // Handle tap on the notification item
-//               },
-//             ),
-//           );
-//         },
-//       ),

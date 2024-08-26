@@ -1,4 +1,9 @@
 # Miscellaneous
+.env
+lib\splash_screen.dart
+lib\auth_screen.dart
+lib\status_update_sreen.dart
+functions\index.js
 *.class
 *.log
 *.pyc
@@ -9,7 +14,6 @@
 .history
 .svn/
 migrate_working_dir/
-
 # IntelliJ related
 *.iml
 *.ipr

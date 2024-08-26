@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_document_picker/flutter_document_picker.dart';
@@ -27,16 +29,31 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   File? _theselectedImage;
   File? _theselectedFile;
   var selmedium = 'Medium';
-
+  String rep = '';
   String dropdownValue = 'Select';
   String dropdown = 'Select';
-  List<String> allEmployees = [];
+  String? selectedEmployeeImageUrl;
+  List<Map<String, dynamic>> allEmployees = [];
   List<String> selectedEmployees = [];
   List<String> addedMembers = [];
 
+  void gemini_test() async {
+    await dotenv.load(fileName: '.env');
+    final apiKey = dotenv.env['API_KEY'];
+    if (apiKey == null) {
+      print('API_KEY environment variable is not set.');
+      exit(1);
+    }
+    final model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
+    final content = [Content.text("How far is Andromeda Galaxy from Milky")];
+    final response = await model.generateContent(content);
+    setState(() {
+      rep = response.text!;
+    });
+  }
+
   void _submit() async {
     final isValid = _createformKey.currentState!.validate();
-
     if (!isValid || chosenDate == null || selectedEmployees.isEmpty) {
       if (chosenDate == null) {
         ScaffoldMessenger.of(context).clearSnackBars();
@@ -85,32 +102,26 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       }
       return;
     }
-
     _createformKey.currentState!.save();
     setState(() {
       isCreating = true;
     });
-
     String uniqueImageName = uuid.v4();
-
     try {
       final imgstorageref = FirebaseStorage.instance
           .ref()
           .child('img_attachments')
           .child('$uniqueImageName.jpg');
       String? taskimgURL; // Initialize it to null
-
       if (_theselectedImage != null) {
         await imgstorageref.putFile(_theselectedImage!);
         taskimgURL = await imgstorageref.getDownloadURL();
       }
-
       final docstorageref = FirebaseStorage.instance
           .ref()
           .child('doc_attachments')
           .child('$uniqueImageName.pdf');
       String? taskdocURL; // Initialize it to null
-
       if (_theselectedFile != null) {
         await docstorageref.putFile(_theselectedFile!);
         taskdocURL = await docstorageref.getDownloadURL();
@@ -121,28 +132,27 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
           .doc(devtoken.uid)
           .get();
       final usertoken = currUsertoken.data()!['deviceToken'];
-      final FullName = currUsertoken.data()!['username'];
-      final Role = currUsertoken.data()!['role'];
-
+      final fullName = currUsertoken.data()!['username'];
       await FirebaseFirestore.instance.collection('taskdetails').add({
         'Task name': _enteredtaskname,
         'Task details': _enteredtaskdetails,
         'due_date': chosenDate,
         if (selectedEmployees.isNotEmpty)
           'selected_employee': selectedEmployees,
+        if (selectedEmployees.isNotEmpty)
+          'selected_employee_imageUrl': selectedEmployeeImageUrl,
         if (addedMembers.isNotEmpty) 'added_employee': addedMembers,
         if (taskimgURL != null) 'task_img': taskimgURL,
         if (linktextfiels) 'task_link': _enteredlink,
         if (taskdocURL != null) 'task_doc': taskdocURL,
         'Priority': selmedium,
         'device_token': usertoken,
-        'Full Name': FullName,
-        'role': Role,
+        'Assigned by': fullName,
       });
-
       setState(() {
         isCreating = false;
         Navigator.of(context).pop();
+        selectedEmployees.clear();
         dropdown = 'Select';
         dropdownValue = 'Select';
         _createformKey.currentState!.reset();
@@ -169,14 +179,32 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       setState(() {
         isCreating = false;
       });
-
-      // Handle the error as needed.
     }
   }
 
-  void resetDropdownValue() {
+  void resetDropdown() {
     setState(() {
       dropdown = 'Select';
+    });
+  }
+
+  Stream<List<Map<String, dynamic>>> getUsersStream() {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .where('role', isEqualTo: 'Employee')
+        .snapshots()
+        .map((QuerySnapshot querySnapshot) {
+      // Extract the document data and convert to List<Map<String, dynamic>>
+      List<Map<String, dynamic>> users = querySnapshot.docs.map((doc) {
+        return {
+          'username': doc['username'] as String,
+          'imageUrl': doc['image_url'] as String,
+        };
+      }).toList();
+      // Sort the users list alphabetically based on 'username'
+      users.sort((a, b) =>
+          (a['username'] as String).compareTo(b['username'] as String));
+      return users; // Return the sorted list of users
     });
   }
 
@@ -185,7 +213,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
-      lastDate: DateTime(2055),
+      lastDate: DateTime(3000),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -212,34 +240,13 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       setState(() {
         chosenDate = pickedDate;
       });
-
-      // Request focus on the Title TextField
     }); //furture can also be used in http requests where you wait for response from the user
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Step 1: Retrieve a list of all users with the role 'Employee'
-    // You need to replace 'users' with the actual Firestore collection name.
-    FirebaseFirestore.instance
-        .collection('users')
-        .where('role', isEqualTo: 'Employee')
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      setState(() {
-        allEmployees =
-            querySnapshot.docs.map((doc) => doc['username'] as String).toList();
-      });
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 48,
         backgroundColor: const Color.fromARGB(255, 226, 233, 238),
       ),
       backgroundColor: const Color.fromARGB(255, 226, 233, 238),
@@ -317,7 +324,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                     ),
                     filled: true,
                     contentPadding:
-                        const EdgeInsetsDirectional.fromSTEB(16, 24, 0, 24),
+                        const EdgeInsetsDirectional.fromSTEB(12, 24, 12, 24),
                   ),
                 ),
                 const SizedBox(height: 15),
@@ -378,11 +385,12 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                     ),
                     filled: true,
                     contentPadding:
-                        const EdgeInsetsDirectional.fromSTEB(16, 24, 0, 24),
+                        const EdgeInsetsDirectional.fromSTEB(12, 24, 12, 24),
                   ),
                 ),
                 const SizedBox(height: 20),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
                       'Due Date',
@@ -409,21 +417,15 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                           child: FittedBox(
                             child: Row(
                               children: [
-                                SizedBox(
+                                Container(
                                   height: 33,
                                   width: 33,
-                                  child: FloatingActionButton(
-                                    heroTag: 'slickback',
-                                    backgroundColor: const Color.fromARGB(
+                                  decoration: BoxDecoration(
+                                    color: const Color.fromARGB(
                                         255, 182, 215, 239),
-                                    elevation: 1.9,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8)),
-                                    foregroundColor: Colors.black,
-                                    onPressed: presentDatePicker,
-                                    child:
-                                        const Icon(Icons.date_range_outlined),
+                                    borderRadius: BorderRadius.circular(8.0),
                                   ),
+                                  child: const Icon(Icons.date_range_outlined),
                                 ),
                                 const SizedBox(width: 10),
                                 FittedBox(
@@ -445,60 +447,125 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                 ),
                 const SizedBox(height: 16),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Text(
                       'Assigned to',
                       style: TextStyle(
-                          color: Color.fromARGB(255, 23, 23, 23),
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600),
+                        color: Color.fromARGB(255, 23, 23, 23),
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Container(
-                        alignment: Alignment.centerLeft,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        padding: const EdgeInsets.fromLTRB(15, 5, 10, 5),
-                        child: FittedBox(
-                            child: DropdownButton<String>(
-                          value: dropdownValue,
-                          items: [
-                            'Select',
-                            ...allEmployees.where(
-                                (employee) => !addedMembers.contains(employee))
-                          ].map<DropdownMenuItem<String>>((value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                value,
-                                style: const TextStyle(fontSize: 18),
-                              ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    FittedBox(
+                      child: StreamBuilder<List<Map<String, dynamic>>>(
+                        stream: getUsersStream(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator()),
                             );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              if (newValue != null && newValue != 'Select') {
-                                // Remove the selected value from allEmployees and add it to selectedEmployees
-                                selectedEmployees.clear();
-                                dropdownValue = newValue;
-                                selectedEmployees.add(newValue);
-                              }
-                            });
-                          },
-                        )),
+                          }
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          }
+                          final List<Map<String, dynamic>> allEmployees =
+                              snapshot.data ?? [];
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
+                            child: DropdownButton<String>(
+                              value: dropdownValue,
+                              items: [
+                                const DropdownMenuItem<String>(
+                                  value: 'Select',
+                                  child: Text('Select',
+                                      style: TextStyle(fontSize: 18)),
+                                ),
+                                for (var employee in allEmployees)
+                                  if (!addedMembers
+                                      .contains(employee['username']))
+                                    DropdownMenuItem<String>(
+                                      value: employee['username']
+                                          .toString(), // Assuming username is a string
+                                      child: Row(
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 18,
+                                            backgroundColor: Colors.white,
+                                            foregroundImage: NetworkImage(
+                                                employee['imageUrl']),
+                                          ),
+                                          const SizedBox(
+                                            width: 8,
+                                          ),
+                                          Text(
+                                            employee['username']
+                                                .toString(), // Assuming username is a string
+                                            style:
+                                                const TextStyle(fontSize: 18),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                              ],
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  if (newValue != null &&
+                                      newValue != 'Select' &&
+                                      !addedMembers.contains(newValue)) {
+                                    var selectedEmployee =
+                                        allEmployees.firstWhere(
+                                      (employee) =>
+                                          employee['username'] == newValue,
+                                    );
+                                    if (selectedEmployee.isNotEmpty) {
+                                      selectedEmployeeImageUrl =
+                                          selectedEmployee[
+                                              'imageUrl']; // Add imageUrl here
+                                      selectedEmployees.clear();
+                                      dropdownValue = newValue;
+                                      selectedEmployees.add(newValue);
+                                    }
+                                  }
+                                });
+                              },
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(
-                  height: 12,
+                  height: 15,
+                ),
+                // Container(
+                //   padding: const EdgeInsets.only(top: 5, bottom: 5),
+                //   child: InkWell(
+                //     onTap: () {},
+                //     child: Text("Your answer: $rep"),
+                //   ),
+                // ),
+
+                const SizedBox(   
+                  height: 10,
                 ),
                 Row(
                   children: [
@@ -570,72 +637,115 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                           fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(width: 10),
-                    Expanded(
-                      child: Container(
-                        alignment: Alignment.centerLeft,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        padding: const EdgeInsets.fromLTRB(15, 5, 10, 5),
-                        child: Column(
-                          children: [
-                            DropdownButton<String>(
-                                value: dropdown,
-                                items: [
-                                  'Select',
-                                  ...allEmployees.where((employee) =>
-                                      !selectedEmployees.contains(employee))
-                                ].map<DropdownMenuItem<String>>((value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(
-                                      value,
-                                      style: const TextStyle(fontSize: 18),
+                    StreamBuilder<List<Map<String, dynamic>>>(
+                        stream: getUsersStream(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator()),
+                            );
+                          }
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          }
+                          final List<Map<String, dynamic>> allEmployees =
+                              snapshot.data ?? [];
+                          return Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  DropdownButton<String>(
+                                    value: dropdown,
+                                    items: [
+                                      const DropdownMenuItem<String>(
+                                        value: 'Select',
+                                        child: Text('Select',
+                                            style: TextStyle(fontSize: 18)),
+                                      ),
+                                      for (var employee in allEmployees)
+                                        if (!selectedEmployees
+                                            .contains(employee['username']))
+                                          DropdownMenuItem<String>(
+                                            value: employee['username']
+                                                .toString(), // Assuming username is a string
+                                            child: Row(
+                                              children: [
+                                                CircleAvatar(
+                                                  radius: 18,
+                                                  backgroundColor: Colors.white,
+                                                  foregroundImage: NetworkImage(
+                                                      employee['imageUrl']),
+                                                ),
+                                                const SizedBox(
+                                                  width: 7,
+                                                ),
+                                                Text(
+                                                  employee['username']
+                                                      .toString(), // Assuming username is a string
+                                                  style: const TextStyle(
+                                                      fontSize: 18),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                    ],
+                                    onChanged: (String? addValue) {
+                                      setState(() {
+                                        if (addValue != null &&
+                                            addValue != 'Select' &&
+                                            !selectedEmployees
+                                                .contains(addValue) &&
+                                            !addedMembers.contains(addValue)) {
+                                          // Remove the selected value from allEmployees and add it to selectedEmployees
+                                          dropdown = addValue;
+                                          addedMembers.add(addValue);
+                                        }
+                                      });
+                                    },
+                                  ),
+                                  SingleChildScrollView(
+                                    reverse: true,
+                                    scrollDirection: Axis.horizontal,
+                                    child: Wrap(
+                                      spacing: 8.0,
+                                      runSpacing: 8.0,
+                                      children: addedMembers
+                                          .map((value) => Chip(
+                                                backgroundColor:
+                                                    const Color.fromARGB(
+                                                        255, 226, 236, 243),
+                                                label: Text(value),
+                                                onDeleted: () {
+                                                  setState(() {
+                                                    addedMembers.remove(value);
+                                                    resetDropdown();
+                                                  });
+                                                },
+                                              ))
+                                          .toList(),
                                     ),
-                                  );
-                                }).toList(),
-                                onChanged: (String? addValue) {
-                                  setState(() {
-                                    if (addValue != null &&
-                                        addValue != 'Select' &&
-                                        !selectedEmployees.contains(addValue) &&
-                                        !addedMembers.contains(addValue)) {
-                                      // Remove the selected value from allEmployees and add it to selectedEmployees
-                                      dropdown = addValue;
-                                      addedMembers.add(addValue);
-                                    }
-                                  });
-                                }),
-                            SingleChildScrollView(
-                              reverse: true,
-                              scrollDirection: Axis.horizontal,
-                              child: Wrap(
-                                spacing: 8.0,
-                                runSpacing: 8.0,
-                                children: addedMembers
-                                    .map((value) => Chip(
-                                          backgroundColor: const Color.fromARGB(
-                                              255, 226, 236, 243),
-                                          label: Text(value),
-                                          onDeleted: () {
-                                            setState(() {
-                                              addedMembers.remove(value);
-                                              resetDropdownValue();
-                                            });
-                                          },
-                                        ))
-                                    .toList(),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
+                          );
+                        }),
                   ],
                 ),
                 const SizedBox(
@@ -675,9 +785,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                         onPressed: () async {
                           final path =
                               await FlutterDocumentPicker.openDocument();
-                          print(path);
                           _theselectedFile = File(path!);
-                          //firebase_storage.UploadTask task = await uploadFile(file);
                         },
                         child: const Icon(Icons.description_outlined),
                       ),
@@ -760,10 +868,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                       ),
                       filled: true,
                       contentPadding:
-                          const EdgeInsetsDirectional.fromSTEB(16, 24, 0, 24),
+                          const EdgeInsetsDirectional.fromSTEB(12, 24, 12, 24),
                     ),
                   ),
-
                 const SizedBox(
                   height: 35,
                 ),

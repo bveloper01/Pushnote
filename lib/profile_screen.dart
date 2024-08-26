@@ -345,6 +345,24 @@ class _ProfilePageState extends State<ProfilePage> {
                                 TextStyle(fontSize: 18, color: Colors.black54),
                           ),
                         ),
+                        ListTile(
+                          onTap: () {
+                            FirebaseAuth.instance.signOut();
+                            Navigator.of(context).pop();
+                          },
+                          leading: const Icon(
+                            Icons.arrow_back_rounded,
+                            color: Colors.black54,
+                            size: 22,
+                          ),
+                          title: const Text(
+                            'Signout',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -352,8 +370,8 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const Padding(
                 padding: EdgeInsets.only(bottom: 20),
-                child: Text('vNov.1',
-                    style: TextStyle(fontSize: 15, color: Colors.black54)),
+                child: Text('vJun.2',
+                    style: TextStyle(fontSize: 16, color: Colors.black54)),
               ),
             ],
           ),

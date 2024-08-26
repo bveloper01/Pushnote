@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // A MessageBubble for showing a single chat message on the ChatScreen.
 class MessageBubble extends StatelessWidget {
@@ -92,7 +94,7 @@ class MessageBubble extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: isMe
                           ? const Color.fromARGB(255, 178, 236, 209)
-                          : const Color.fromARGB(255, 196, 219, 237),
+                          : const Color(0xFFF5F5F5),
                       // Only show the message bubble's "speaking edge" if first in
                       // the chain.
                       // Whether the "speaking edge" is on the left or right depends
@@ -100,12 +102,12 @@ class MessageBubble extends StatelessWidget {
                       borderRadius: BorderRadius.only(
                         topLeft: !isMe && isFirstInSequence
                             ? Radius.zero
-                            : const Radius.circular(12),
+                            : const Radius.circular(20),
                         topRight: isMe && isFirstInSequence
                             ? Radius.zero
-                            : const Radius.circular(12),
-                        bottomLeft: const Radius.circular(12),
-                        bottomRight: const Radius.circular(12),
+                            : const Radius.circular(20),
+                        bottomLeft: const Radius.circular(20),
+                        bottomRight: const Radius.circular(20),
                       ),
                     ),
                     // Set some reasonable constraints on the width of the
@@ -121,15 +123,22 @@ class MessageBubble extends StatelessWidget {
                       vertical: 4,
                       horizontal: 12,
                     ),
-                    child: Text(
-                      message,
+                    child: Linkify(
+                      onOpen: (link) async {
+                        final Uri uri = Uri.parse(link.url);
+                        if (!await launchUrl(uri)) {
+                          throw Exception('Could not launch $uri');
+                        }
+                      },
+                      text: message,
                       style: TextStyle(
-                        // Add a little line spacing to make the text look nicer
-                        // when multilined.
                         height: 1.3,
                         color: isMe ? Colors.black87 : Colors.black87,
                       ),
-                      softWrap: true,
+                      linkStyle: const TextStyle(
+                        color: Color.fromARGB(255, 35, 109, 169),
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                 ],

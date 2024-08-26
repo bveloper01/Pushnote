@@ -117,7 +117,6 @@ class _AuthScreenState extends State<AuthScreen> {
             .child('${userCred.user!.uid}.jpg');
         await storageRef.putFile(_selectedImage!);
         final imageUrl = await storageRef.getDownloadURL();
-
         final firebsecm = FirebaseMessaging.instance;
         final noti = await firebsecm.requestPermission();
 

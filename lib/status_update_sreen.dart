@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:push_drive/profile_screen.dart';
 
 class TaskStatusListPage extends StatefulWidget {
   @override
@@ -8,17 +9,54 @@ class TaskStatusListPage extends StatefulWidget {
 }
 
 class _TaskStatusListPageState extends State<TaskStatusListPage> {
+  double height = AppBar().preferredSize.height;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          'Task updates',
-          style: TextStyle(
-              color: Color.fromARGB(255, 23, 23, 23),
-              fontSize: 20,
-              fontWeight: FontWeight.w600),
+        surfaceTintColor: Colors.blue,
+        backgroundColor: const Color.fromARGB(255, 196, 219, 237),
+        title: Row(
+          children: [
+            const Expanded(
+              child: Text(
+                ' Task Updates',
+                style: TextStyle(
+                    color: Color.fromARGB(255, 23, 23, 23),
+                    fontSize: 21,
+                    fontWeight: FontWeight.w600),
+              ),
+            ),
+            PopupMenuButton<int>(
+              constraints: const BoxConstraints.expand(width: 150, height: 60),
+              color: Colors.white,
+              surfaceTintColor: Colors.white,
+              offset: Offset(0, height - 15),
+              onSelected: (value) {},
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+                PopupMenuItem<int>(
+                  value: 1,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ProfilePage()),
+                    );
+                  },
+                  child: const Text(
+                    'Settings',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                ),
+              ],
+              child: const Icon(
+                Icons.more_vert_rounded,
+                size: 23,
+              ),
+            ),
+          ],
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -39,6 +77,7 @@ class _TaskStatusListPageState extends State<TaskStatusListPage> {
             ));
           } else {
             return ListView.builder(
+              padding: const EdgeInsets.only(bottom: 10),
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (context, index) {
                 final item = snapshot.data!.docs[index];
@@ -46,8 +85,12 @@ class _TaskStatusListPageState extends State<TaskStatusListPage> {
                 String formattedDueDate = DateFormat.yMMMd().format(duedate);
 
                 return Card(
+                  surfaceTintColor: Colors.white,
+                  color: const Color.fromARGB(255, 230, 239, 247),
+                  elevation: 1,
                   shape: RoundedRectangleBorder(
-                      side: const BorderSide(color: Colors.black12),
+                      side: const BorderSide(
+                          color: Color.fromARGB(31, 111, 111, 111)),
                       borderRadius: BorderRadius.circular(20)),
                   margin: const EdgeInsets.only(
                     top: 10,
@@ -76,6 +119,14 @@ class _TaskStatusListPageState extends State<TaskStatusListPage> {
                         const SizedBox(
                           height: 5,
                         ),
+                        Text(
+                          'Status updated by: ${item['who updated']}',
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
                       ],
                     ),
                     subtitle: Text(
@@ -90,14 +141,6 @@ class _TaskStatusListPageState extends State<TaskStatusListPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Status updated by: ${item['who updated']}',
-                              style: const TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.w500),
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Text(
                               'Role: ${item['role']}',
                               style: const TextStyle(
                                   fontSize: 15, fontWeight: FontWeight.w500),
@@ -109,6 +152,9 @@ class _TaskStatusListPageState extends State<TaskStatusListPage> {
                               'Task Status: ${item['Tname status']} ',
                               style: const TextStyle(
                                   fontSize: 15, fontWeight: FontWeight.w500),
+                            ),
+                            const SizedBox(
+                              height: 3,
                             ),
                           ],
                         ),

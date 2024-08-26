@@ -18,6 +18,7 @@ class TaskDetailsPage extends StatefulWidget {
   final String taskImg;
   final String tasklink;
   final String taskdoc;
+  final String selectedpersonImageUrl;
 
   TaskDetailsPage(
       {required this.taskName,
@@ -28,6 +29,7 @@ class TaskDetailsPage extends StatefulWidget {
       required this.tasklink,
       required this.taskdoc,
       required this.selectedperson,
+      required this.selectedpersonImageUrl,
       required this.addedperson});
 
   @override
@@ -40,19 +42,15 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
 
   bool isupdating = false;
   String _enteredstatus = '';
-
   var newday = 'Not started';
   var mystatus = 'To do';
-
   void skillBasedMatching() async {
     final forUserName = FirebaseAuth.instance.currentUser!;
-
     final currUserData = await FirebaseFirestore.instance
         .collection('users')
         .doc(forUserName.uid)
         .get();
     final role = currUserData.data()!['role'];
-
     setState(() {
       if (role == 'Employee') {
         statusrole = true;
@@ -72,7 +70,6 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   }
 
   // Load the selected status from shared preferences
-
   Future<void> loadSelectedStatus(String taskName) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -104,28 +101,21 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
     if (!isValid) {
       return;
     }
-
     statusformKey.currentState!.save();
     setState(() {
       isupdating = true;
     });
     final forUserName = FirebaseAuth.instance.currentUser!;
-
     final currUserData = await FirebaseFirestore.instance
         .collection('users')
         .doc(forUserName.uid)
         .get();
     final role = currUserData.data()!['role'];
     final whoUpdated = currUserData.data()!['username'];
-
     try {
-      print('the status is here $_enteredstatus');
-
       final theDevicetoken = FirebaseMessaging.instance;
       await theDevicetoken.requestPermission();
-
       final updatingDevicetoken = await theDevicetoken.getToken();
-
       await FirebaseFirestore.instance.collection('taskstatus').add({
         'Tname': widget.taskName,
         'Tname status': _enteredstatus,
@@ -344,7 +334,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.only(
-                        left: 15, top: 18, bottom: 18, right: 15),
+                        left: 12, top: 9, bottom: 9, right: 12),
                     alignment: Alignment.centerLeft,
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -354,12 +344,25 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                       ),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    child: Text(
-                      widget.selectedperson,
-                      style: const TextStyle(
-                          color: Color.fromARGB(255, 23, 23, 23),
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Colors.white,
+                          foregroundImage:
+                              NetworkImage(widget.selectedpersonImageUrl),
+                        ),
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          widget.selectedperson,
+                          style: const TextStyle(
+                              color: Color.fromARGB(255, 23, 23, 23),
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ],
                     ),
                   ),
                 ),

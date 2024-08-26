@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:push_drive/ai_chatbot_screen.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:push_drive/create_task_screen.dart';
 import 'package:push_drive/profile_screen.dart';
-import 'package:push_drive/widgets/drawer.dart';
 import 'package:push_drive/widgets/task_list.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,6 +20,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var homedp;
+  double height = AppBar().preferredSize.height;
+  bool _isTextVisible = false;
   String homename = '';
   var showbtn = false;
   int highPriorityCount = 0;
@@ -133,43 +137,74 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
+  void _toggleTextVisibility() {
+    setState(() {
+      _isTextVisible = !_isTextVisible;
+    });
+  }
+
+  final GlobalKey<ExpandableFabState> fabKey = GlobalKey<ExpandableFabState>();
   Widget buildFloatingActionButton() {
     return Visibility(
       visible: showbtn,
-      child: SpeedDial(
-        shape: RoundedRectangleBorder(
-          // Use RoundedRectangleBorder for a rectangular shape
-          borderRadius:
-              BorderRadius.circular(100.0), // Adjust the radius as needed
+      child: ExpandableFab(
+        key: fabKey,
+        fanAngle: 40,
+        distance: 60.0,
+        type: ExpandableFabType.up,
+        duration: const Duration(milliseconds: 300),
+        childrenOffset: const Offset(9, 8),
+        openButtonBuilder: RotateFloatingActionButtonBuilder(
+          child: const Icon(
+            Icons.create,
+          ),
+          fabSize: ExpandableFabSize.regular,
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.blue,
+          shape: const CircleBorder(),
+          angle: 3.14 * 2,
         ),
-        activeIcon: Icons.close,
-        spacing: 6,
-        overlayColor: Colors.black38,
-        spaceBetweenChildren: 6,
+        closeButtonBuilder: FloatingActionButtonBuilder(
+          size: 56,
+          builder: (BuildContext context, void Function()? onPressed,
+              Animation<double> progress) {
+            return IconButton(
+              onPressed: onPressed,
+              icon: const Icon(
+                Icons.cancel,
+                size: 50,
+              ),
+            );
+          },
+        ),
+        overlayStyle: ExpandableFabOverlayStyle(
+          // color: Colors.black.withOpacity(0.5),
+          blur: 12,
+        ),
         children: [
-          SpeedDialChild(
-            elevation: 4,
-            labelStyle:
-                const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+          FloatingActionButton.small(
             shape: const CircleBorder(),
-            child: const Icon(
-              Icons.add_task_rounded,
-              size: 28,
-            ),
-            label: 'Assign a task',
-            onTap: () {
+            heroTag: null,
+            child: const Icon(Icons.videocam),
+            onPressed: () {
+              _toggleTextVisibility();
+              fabKey.currentState?.toggle();
+            },
+          ),
+          FloatingActionButton.small(
+            shape: const CircleBorder(),
+            heroTag: null,
+            child: const Icon(Icons.add_task_rounded),
+            onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => const CreateTaskScreen()),
               );
+              fabKey.currentState?.toggle();
             },
           ),
         ],
-        child: const Icon(
-          Icons.add,
-          size: 25,
-        ),
       ),
     );
   }
@@ -178,78 +213,204 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      drawer: const MainDrawer(),
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 196, 219, 237),
-        toolbarHeight: 82,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Welcome back,',
-              style: TextStyle(
-                  fontSize: 17,
-                  color: Colors.black54,
-                  fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            Text(
-              homename,
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-            ),
-          ],
-        ),
-        actions: [
-          Container(
-            padding: const EdgeInsets.only(right: 18),
-            child: homedp == null
-                ? const CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Color.fromARGB(255, 223, 249, 250),
-                    foregroundImage: AssetImage(
-                      'images/avatar.png',
-                    ),
-                  )
-                : InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ProfilePage()),
-                      );
-                    },
-                    child: CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.white,
-                      foregroundImage: NetworkImage(homedp),
-                    ),
-                  ),
-          ),
-        ],
-      ),
+      floatingActionButtonLocation: ExpandableFab.location,
       floatingActionButton: buildFloatingActionButton(),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Visibility(
-              visible: showbtn,
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(color: Colors.black12),
-                    borderRadius: BorderRadius.circular(12)),
-                surfaceTintColor: Colors.white,
-                color: const Color.fromARGB(230, 255, 255, 255),
-                margin: const EdgeInsets.only(
-                    left: 11, right: 11, top: 11, bottom: 3),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left: 20, top: 4),
+                child: Row(
+                  children: [
+                    homedp == null
+                        ? const CircleAvatar(
+                            radius: 27,
+                            backgroundColor: Color.fromARGB(255, 223, 249, 250),
+                            foregroundImage: AssetImage(
+                              'images/avatar.png',
+                            ),
+                          )
+                        : CircleAvatar(
+                            radius: 27,
+                            backgroundColor: Colors.white,
+                            foregroundImage: NetworkImage(homedp),
+                          ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text(
+                            'Welcome back,',
+                            style: TextStyle(
+                                fontSize: 12.5,
+                                color: Colors.black54,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          Text(
+                            homename,
+                            style: const TextStyle(
+                                fontSize: 19, fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15.0),
+                      child: IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const AIChatbotScreen()),
+                          );
+                        },
+                        icon: const Icon(
+                          Icons.star,
+                          size: 30,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(right: 12, top: 15, left: 5),
+                      child: PopupMenuButton<int>(
+                        constraints:
+                            const BoxConstraints.expand(width: 150, height: 60),
+                        color: Colors.white,
+                        surfaceTintColor: Colors.white,
+                        offset: Offset(-8, height - 20),
+                        onSelected: (value) {},
+                        itemBuilder: (BuildContext context) =>
+                            <PopupMenuEntry<int>>[
+                          PopupMenuItem<int>(
+                            value: 1,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const ProfilePage()),
+                              );
+                            },
+                            child: const Text(
+                              'Settings',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                          ),
+                        ],
+                        child: const Icon(
+                          Icons.more_vert_rounded,
+                          size: 30,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: Text(
+                    style: const TextStyle(
+                        fontSize: 21,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400),
+                    DateFormat('EEEE, dd/MM/yyyy').format(DateTime.now())),
+              ),
+              const Divider(
+                color: Colors.black, // Change the color
+                thickness: 1, // Change the thickness
+                indent: 19, // Left padding
+                endIndent: 19, // Right padding
+              ),
+              Visibility(
+                visible: _isTextVisible,
+                child: Stack(
+                  children: [
+                    SizedBox(
+                      height: 100,
+                      width: 400,
+                      child: Card(
+                        color: const Color.fromARGB(255, 249, 243, 126),
+                        surfaceTintColor: Colors.white,
+                        elevation: 1.5,
+                        shape: RoundedRectangleBorder(
+                            side: const BorderSide(
+                                color: Color.fromARGB(31, 0, 0, 0)),
+                            borderRadius: BorderRadius.circular(20)),
+                        margin: const EdgeInsets.only(
+                          top: 8,
+                          left: 10,
+                          right: 10,
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.only(bottom: 10, top: 8),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(30)),
+                                  shape: BoxShape.rectangle,
+                                  border: Border.all(
+                                    color: Colors.black, //
+                                    width: 1.0,
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Google Meet Link',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  launchUrl(Uri.parse(
+                                      'https://meet.google.com/hds-mbcp-vzv'));
+                                },
+                                child: const Text(
+                                  'https://meet.google.com/hds-mbcp-vzv',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.blue,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: IconButton(
+                          onPressed: _toggleTextVisibility,
+                          icon: const Icon(
+                            Icons.cancel,
+                            size: 26,
+                          )),
+                    ),
+                  ],
+                ),
+              ),
+              Visibility(
+                visible: showbtn,
                 child: Column(
                   children: [
                     const Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
-                        padding: EdgeInsets.only(left: 19, top: 8, bottom: 4),
+                        padding: EdgeInsets.only(left: 18, top: 15, bottom: 6),
                         child: Text(
                           'Progress Overview',
                           style: TextStyle(
@@ -260,17 +421,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Container(
-                      // color: Colors.amberAccent,
-                      height: 190,
+                      // color: const Color.fromARGB(255, 224, 210, 170),
+                      height: 185,
                       child: GridView(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
                         padding: const EdgeInsets.only(
-                          left: 12,
-                          right: 12,
+                          left: 15,
+                          right: 15,
                         ),
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
-                                childAspectRatio: 6 / 2.86,
+                                childAspectRatio: 6 / 2.8,
                                 crossAxisSpacing: 9,
                                 mainAxisSpacing: 10),
                         children: [
@@ -279,7 +442,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 top: 8, bottom: 8, left: 15, right: 8),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16.0),
-                              color:const Color.fromARGB(255, 177, 206, 252),
+                              color: const Color.fromARGB(255, 177, 206, 252),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,7 +469,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 top: 8, bottom: 8, left: 15, right: 8),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16.0),
-                              color: const Color.fromARGB(250, 245, 188, 91),
+                              color: const Color.fromARGB(255, 255, 221, 83),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,7 +496,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 top: 8, bottom: 8, left: 15, right: 8),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16.0),
-                              color: Color.fromARGB(210, 145, 230, 108),
+                              color: const Color.fromARGB(210, 145, 230, 108),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,7 +523,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 top: 8, bottom: 8, left: 15, right: 8),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16.0),
-                              color: Color.fromARGB(255, 241, 111, 111),
+                              color: const Color.fromARGB(255, 241, 111, 111),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,25 +551,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-            ),
-            Visibility(
-              visible: !showbtn,
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(color: Colors.black12),
-                    borderRadius: BorderRadius.circular(12)),
-                surfaceTintColor: Colors.white,
-                color: const Color.fromARGB(230, 255, 255, 255),
-                margin: const EdgeInsets.only(
-                    left: 11, right: 11, top: 11, bottom: 3),
+              Visibility(
+                visible: !showbtn,
                 child: Column(
                   children: [
                     const Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
-                        padding: EdgeInsets.only(left: 19, top: 8, bottom: 4),
+                        padding: EdgeInsets.only(left: 18, top: 15, bottom: 7),
                         child: Text(
-                          'Progress Overview',
+                          'Task Overview',
                           style: TextStyle(
                               fontSize: 16,
                               color: Colors.black,
@@ -416,17 +570,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     Container(
                       // color: Colors.amberAccent,
-                      height: 190,
+                      height: 185,
                       child: GridView(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
                         padding: const EdgeInsets.only(
-                          left: 12,
-                          right: 12,
+                          left: 15,
+                          right: 15,
                         ),
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
-                                childAspectRatio: 6 / 2.86,
-                                crossAxisSpacing: 10,
+                                childAspectRatio: 6 / 2.8,
+                                crossAxisSpacing: 9,
                                 mainAxisSpacing: 10),
                         children: [
                           Container(
@@ -461,7 +617,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 top: 8, bottom: 8, left: 15, right: 8),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16.0),
-                              color: const Color.fromARGB(250, 245, 188, 91),
+                              color: const Color.fromARGB(255, 255, 221, 83),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -515,7 +671,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 top: 8, bottom: 8, left: 15, right: 8),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16.0),
-                              color: Color.fromARGB(255, 241, 111, 111),
+                              color: const Color.fromARGB(255, 241, 111, 111),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -543,9 +699,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-            ),
-            const EmployerTaskList(),
-          ],
+              const EmployerTaskList(),
+            ],
+          ),
         ),
       ),
     );
