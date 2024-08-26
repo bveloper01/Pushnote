@@ -1,8 +1,7 @@
 # Miscellaneous
 .env
-lib\splash_screen.dart
-lib\auth_screen.dart
-lib\status_update_sreen.dart
+splash_screen.dart
+auth_screen.dart
 functions\index.js
 *.class
 *.log
