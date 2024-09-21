@@ -229,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             radius: 27,
                             backgroundColor: Color.fromARGB(255, 223, 249, 250),
                             foregroundImage: AssetImage(
-                              'images/avatar.png',
+                              'assets/avatar.png',
                             ),
                           )
                         : CircleAvatar(
@@ -312,20 +312,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-              Center(
-                child: Text(
-                    style: const TextStyle(
-                        fontSize: 21,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w400),
-                    DateFormat('EEEE, dd/MM/yyyy').format(DateTime.now())),
-              ),
-              const Divider(
-                color: Colors.black, // Change the color
-                thickness: 1, // Change the thickness
-                indent: 19, // Left padding
-                endIndent: 19, // Right padding
+              const SizedBox(height: 10),
+              Container(
+                height: 60,
+                margin: const EdgeInsets.only(top: 8, left: 12, right: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16.0),
+                  color: const Color.fromARGB(255, 177, 206, 252),
+                ),
+                child: Center(
+                  child: Text(
+                      style: const TextStyle(
+                          fontSize: 21,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w400),
+                      DateFormat('EEEE, dd/MM/yyyy').format(DateTime.now())),
+                ),
               ),
               Visibility(
                 visible: _isTextVisible,

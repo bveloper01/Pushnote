@@ -1,6 +1,6 @@
 # Miscellaneous
 .env
-lib\auth_screen.dart
+auth_screen.dart
 *.class
 *.log
 *.pyc

@@ -294,7 +294,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             radius: 68,
                             backgroundColor: Color.fromARGB(255, 223, 249, 250),
                             foregroundImage: AssetImage(
-                              'images/avatar.png',
+                              'assets/avatar.png',
                             ),
                           )
                         : CircleAvatar(

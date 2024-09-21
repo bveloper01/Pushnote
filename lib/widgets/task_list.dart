@@ -57,7 +57,7 @@ class _EmployerTaskListState extends State<EmployerTaskList> {
                       Padding(
                         padding: EdgeInsets.only(left: 38),
                         child: Image(
-                          image: AssetImage("images/notask.png"),
+                          image: AssetImage("assets/notask.png"),
                           width: 180.0,
                         ),
                       ),

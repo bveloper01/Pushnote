@@ -6,7 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
-import 'package:push_drive/profile_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AIChatbotScreen extends StatefulWidget {
@@ -55,38 +54,6 @@ class _AIChatbotScreenState extends State<AIChatbotScreen> {
               fontSize: 21,
               fontWeight: FontWeight.w600),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: PopupMenuButton<int>(
-              constraints: const BoxConstraints.expand(width: 120, height: 60),
-              color: Colors.white,
-              surfaceTintColor: Colors.white,
-              offset: Offset(0, height - 15),
-              onSelected: (value) {},
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
-                PopupMenuItem<int>(
-                  value: 1,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ProfilePage()),
-                    );
-                  },
-                  child: const Text(
-                    'Settings',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                ),
-              ],
-              child: const Icon(
-                Icons.more_vert_rounded,
-                size: 25,
-              ),
-            ),
-          ),
-        ],
       ),
       body: _buildUI(),
       backgroundColor: const Color.fromARGB(255, 239, 236, 226),

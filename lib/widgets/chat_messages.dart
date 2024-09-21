@@ -29,7 +29,7 @@ class ChatMessages extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image(
-                  image: AssetImage("images/empty.png"),
+                  image: AssetImage("assets/empty.png"),
                   width: 180.0,
                 ),
                 Padding(
@@ -49,7 +49,7 @@ class ChatMessages extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image(
-                  image: AssetImage("images/wrong.png"),
+                  image: AssetImage("assets/wrong.png"),
                   width: 210.0,
                 ),
                 Padding(

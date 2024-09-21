@@ -39,7 +39,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
             radius: 40,
             backgroundImage: _pickedImageFile == null
                 ? const AssetImage(
-                    'images/avatar.png',
+                    'assets/avatar.png',
                   )
                 : null,
             backgroundColor: Colors.white,

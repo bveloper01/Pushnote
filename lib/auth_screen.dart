@@ -32,7 +32,6 @@ class _AuthScreenState extends State<AuthScreen> {
 
   void _submit() async {
     final isValid = _formKey.currentState!.validate();
-
     if (!isValid || !_isLogin && _selectedImage == null) {
       if (_selectedImage == null && !_isLogin) {
         setState(() {
@@ -52,9 +51,7 @@ class _AuthScreenState extends State<AuthScreen> {
       }
       return; // This return statement should be outside of the setState block
     }
-
     // This return statement should be outside of the setState block
-
     _formKey.currentState!.save();
 
     setState(() {
@@ -113,12 +110,11 @@ class _AuthScreenState extends State<AuthScreen> {
 
         final storageRef = FirebaseStorage.instance
             .ref()
-            .child('userImages')
+            .child('userassets')
             .child('${userCred.user!.uid}.jpg');
         await storageRef.putFile(_selectedImage!);
         final imageUrl = await storageRef.getDownloadURL();
         final firebsecm = FirebaseMessaging.instance;
-        final noti = await firebsecm.requestPermission();
 
         final token = await firebsecm.getToken();
         print("the token is her guys $token");
@@ -199,7 +195,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               padding:
                                   const EdgeInsets.only(top: 35, bottom: 10),
                               child: const Image(
-                                image: AssetImage("images/two.png"),
+                                image: AssetImage("assets/two.png"),
                                 width: 390.0,
                               ),
                             ),
@@ -230,7 +226,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               padding:
                                   const EdgeInsets.only(top: 42, bottom: 10),
                               child: const Image(
-                                image: AssetImage("images/one.png"),
+                                image: AssetImage("assets/one.png"),
                                 width: 390.0,
                               ),
                             ),
@@ -262,7 +258,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               padding:
                                   const EdgeInsets.only(top: 8, bottom: 15),
                               child: const Image(
-                                image: AssetImage("images/three.png"),
+                                image: AssetImage("assets/three.png"),
                                 width: 390.0,
                               ),
                             ),
