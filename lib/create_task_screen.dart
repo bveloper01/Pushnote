@@ -22,7 +22,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   var _enteredtaskname = '';
   bool linktextfiels = false;
   var _enteredtaskdetails = '';
-  var uuid = Uuid();
+  var uuid = const Uuid();
   String? _enteredlink;
   var isCreating = false;
   DateTime? chosenDate;

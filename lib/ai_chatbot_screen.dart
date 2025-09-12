@@ -218,7 +218,7 @@ class _AIChatbotScreenState extends State<AIChatbotScreen> {
         if (lastMessage != null && lastMessage.user == geminiUser) {
           lastMessage = messages.removeAt(0);
           String response = event.content?.parts?.fold(
-                  "", (previous, current) => "$previous${current.text}") ??
+                  "", (previous, current) => "$previous${current}") ??
               "";
           lastMessage.text += response;
           setState(() {
@@ -226,7 +226,7 @@ class _AIChatbotScreenState extends State<AIChatbotScreen> {
           });
         } else {
           String response = event.content?.parts?.fold(
-                  "", (previous, current) => "$previous${current.text}") ??
+                  "", (previous, current) => "$previous${current}") ??
               "";
           ChatMessage message = ChatMessage(
             user: geminiUser,

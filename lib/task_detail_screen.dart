@@ -20,8 +20,8 @@ class TaskDetailsPage extends StatefulWidget {
   final String taskdoc;
   final String selectedpersonImageUrl;
 
-  TaskDetailsPage(
-      {required this.taskName,
+  const TaskDetailsPage(
+      {super.key, required this.taskName,
       required this.taskDetails,
       required this.taskdate,
       required this.taskpriority,
@@ -170,24 +170,24 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
 
     Uri? docuri = Uri.parse(widget.taskdoc);
     Uri? uri = Uri.parse(widget.tasklink);
-    bool _isimgthere = false;
+    bool isimgthere = false;
 
-    if (this.widget.taskImg != '') {
-      _isimgthere = true;
+    if (widget.taskImg != '') {
+      isimgthere = true;
     }
-    bool _islinkthere = false;
-    if (this.widget.tasklink != '') {
-      _islinkthere = true;
-    }
-
-    bool _isdocthere = false;
-    if (this.widget.taskdoc != '') {
-      _isdocthere = true;
+    bool islinkthere = false;
+    if (widget.tasklink != '') {
+      islinkthere = true;
     }
 
-    bool _isaddedmember = false;
-    if (this.widget.addedperson.isNotEmpty) {
-      _isaddedmember = true;
+    bool isdocthere = false;
+    if (widget.taskdoc != '') {
+      isdocthere = true;
+    }
+
+    bool isaddedmember = false;
+    if (widget.addedperson.isNotEmpty) {
+      isaddedmember = true;
     }
 
     if (widget.taskpriority == 'High') {
@@ -393,8 +393,8 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 ),
               ],
             ),
-            if (_isaddedmember) const SizedBox(height: 20),
-            if (_isaddedmember)
+            if (isaddedmember) const SizedBox(height: 20),
+            if (isaddedmember)
               Row(
                 children: [
                   const Text(
@@ -679,9 +679,9 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                   ),
                 ],
               ),
-            if (_isimgthere || _islinkthere || _isdocthere)
+            if (isimgthere || islinkthere || isdocthere)
               const SizedBox(height: 19),
-            if (_isimgthere || _islinkthere || _isdocthere)
+            if (isimgthere || islinkthere || isdocthere)
               Row(
                 children: [
                   const Text(
@@ -692,7 +692,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                         fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(width: 30),
-                  if (_isimgthere)
+                  if (isimgthere)
                     SizedBox(
                       height: 35,
                       width: 35,
@@ -729,11 +729,11 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                         child: const Icon(Icons.image),
                       ),
                     ),
-                  if (_isimgthere)
+                  if (isimgthere)
                     const SizedBox(
                       width: 15,
                     ),
-                  if (_islinkthere)
+                  if (islinkthere)
                     SizedBox(
                       height: 35,
                       width: 35,
@@ -753,11 +753,11 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                         child: const Icon(Icons.link),
                       ),
                     ),
-                  if (_islinkthere)
+                  if (islinkthere)
                     const SizedBox(
                       width: 15,
                     ),
-                  if (_isdocthere)
+                  if (isdocthere)
                     SizedBox(
                       height: 35,
                       width: 35,

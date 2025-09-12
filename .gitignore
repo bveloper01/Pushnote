@@ -7,9 +7,11 @@ auth_screen.dart
 *.swp
 .DS_Store
 .atom/
-.buildlog/
+lib/home_screen.dart
 .history
 .svn/
+.swiftpm/
+lib/firebase_options.dart
 migrate_working_dir/
 # IntelliJ related
 *.iml

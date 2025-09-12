@@ -13,9 +13,9 @@ class tabScreens extends StatefulWidget {
 class _tabScreensState extends State<tabScreens> {
   int _selectedPageIndex = 0;
   final screens = [
-    HomeScreen(),
-    GlobalChatScreen(),
-    TaskStatusListPage(),
+    const HomeScreen(),
+    const GlobalChatScreen(),
+    const TaskStatusListPage(),
   ];
 
   @override

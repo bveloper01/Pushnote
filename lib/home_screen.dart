@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
     overduePriorityCount = 0;
 
     // Iterate through documents and count priorities
-    querySnapshot.docs.forEach((DocumentSnapshot document) {
+    for (var document in querySnapshot.docs) {
       Map<String, dynamic> data = document.data() as Map<String, dynamic>;
 
       // Check the priority field and update the corresponding count
@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
         default:
           break;
       }
-    });
+    }
 
     // Update the state to trigger a rebuild with the updated counts
     setState(() {});
@@ -103,12 +103,12 @@ class _HomeScreenState extends State<HomeScreen> {
     overdueerCount = 0;
 
     // Iterate through documents and count priorities
-    querytwoSnapshot.docs.forEach((DocumentSnapshot document) {
+    for (var document in querytwoSnapshot.docs) {
       Map<String, dynamic> data = document.data() as Map<String, dynamic>;
 
       // Check the priority field and update the corresponding count
-      String current_status = data['current_status'];
-      switch (current_status) {
+      String currentStatus = data['current_status'];
+      switch (currentStatus) {
         case 'In Progress':
           inProgresCount++;
           break;
@@ -124,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
         default:
           break;
       }
-    });
+    }
 
     // Update the state to trigger a rebuild with the updated counts
     setState(() {});
@@ -422,11 +422,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                    Container(
+                    SizedBox(
                       // color: const Color.fromARGB(255, 224, 210, 170),
-                      height: 185,
+                      height: 200,
                       child: GridView(
-                        physics: NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         padding: const EdgeInsets.only(
                           left: 15,
@@ -435,7 +435,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
-                                childAspectRatio: 6 / 2.8,
+                                childAspectRatio: 6 / 3,
                                 crossAxisSpacing: 9,
                                 mainAxisSpacing: 10),
                         children: [
@@ -570,11 +570,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                    Container(
+                    SizedBox(
                       // color: Colors.amberAccent,
-                      height: 185,
+                      height: 190,
                       child: GridView(
-                        physics: NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         padding: const EdgeInsets.only(
                           left: 15,
@@ -583,7 +583,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
-                                childAspectRatio: 6 / 2.8,
+                                childAspectRatio: 6 / 3,
                                 crossAxisSpacing: 9,
                                 mainAxisSpacing: 10),
                         children: [
@@ -646,7 +646,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 top: 8, bottom: 8, left: 15, right: 8),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16.0),
-                              color: Color.fromARGB(210, 145, 230, 108),
+                              color: const Color.fromARGB(210, 145, 230, 108),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

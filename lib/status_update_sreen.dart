@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:push_drive/profile_screen.dart';
 
 class TaskStatusListPage extends StatefulWidget {
+  const TaskStatusListPage({super.key});
+
   @override
   State<TaskStatusListPage> createState() => _TaskStatusListPageState();
 }
